@@ -1,0 +1,11 @@
+{
+  "src": "<url to the .zip file created by the release script>",
+  "name": "MBAP",
+  "raw_name": "MBAP",
+  "version": "1.0",
+  "kind": "addon",
+  "short": "Matrix-Based Amplitude Panning",
+  "long": "This addon provides Matrix-Based Amplitude Panning",
+  "small": "https://raw.githubusercontent.com/OSSIA/score-addon-tutorial/master/Deployment/icon.png",
+  "key": "00438F31-87DE-4471-97BF-00E0E2A8F70D"
+}
