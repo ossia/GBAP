@@ -1,7 +1,7 @@
 #pragma once
 #include <MBAP/MBAPModel.hpp>
 #include <halp/layout.hpp>
-
+/*
 namespace Example
 {
 struct MBAP::ui
@@ -17,3 +17,4 @@ struct MBAP::ui
   halp::item<&ins::gain> gain;
 };
 }
+*/
