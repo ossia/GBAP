@@ -108,7 +108,7 @@ void MBAP::operator()(halp::tick t)
   }
   volumes = rollOffArray(volumes);
   if (inputs.weights.value.size() > 0) volumes = mult(volumes, inputs.weights.value[inputs.systemNumber.value-1]);
-  //volumes = mult(volumes, inputs.gain.value);
+  volumes = mult(volumes, inputs.gain.value);
   //vols = vols.concat(volumes);
   //outputs.weights.value[0] = posX;
   //outputs.weights.value[1] = posY;
