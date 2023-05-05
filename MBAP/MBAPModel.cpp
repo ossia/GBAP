@@ -14,24 +14,24 @@ void MBAP::operator()(halp::tick t)
 
   if (inputs.nSinksX.value>1){
     minX = std::min(std::max(0.f,(inputs.pos.value.x-inputs.cursorSize.value.x/2)),0.999999f);
-    float ModminX = minX/(inputs.sinkSize.value.x+intervX);
+    float ModminX = (float)minX/(inputs.sinkSize.value.x+intervX);
     ModmX = std::floor(ModminX)*2;
-    if (ModminX-ModmX/2 >= inputs.sinkSize.value.x/(inputs.nSinksX.value+intervX)) ModmX++;
-    maxX = std::min(std::max(0.f, float(inputs.pos.value.x+inputs.cursorSize.value.x/2)),0.999999f);
-    float ModmaxX = maxX/(inputs.sinkSize.value.x+intervX);
+    if (ModminX-(float)ModmX/2 >= inputs.sinkSize.value.x/(inputs.sinkSize.value.x+intervX)) ModmX++;
+    maxX = std::min(std::max(0.f, inputs.pos.value.x+inputs.cursorSize.value.x/2),0.999999f);
+    float ModmaxX = (float)maxX/(inputs.sinkSize.value.x+intervX);
     ModMX = std::floor(ModmaxX)*2;
-    if (ModmaxX-ModMX/2 >= inputs.sinkSize.value.x/(inputs.sinkSize.value.x+intervX)) ModMX++;
+    if (ModmaxX-(float)ModMX/2 >= inputs.sinkSize.value.x/(inputs.sinkSize.value.x+intervX)) ModMX++;
   }
 
-  if (inputs.nSinksX.value>1){
+  if (inputs.nSinksY.value>1){
     minY = std::min(std::max(0.f,(inputs.pos.value.y-inputs.cursorSize.value.y/2)),0.999999f);
-    float ModminY = minY/(inputs.sinkSize.value.y+intervY);
+    float ModminY = (float)minY/(inputs.sinkSize.value.y+intervY);
     ModmY = std::floor(ModminY)*2;
-    if (ModminY-ModmY/2 >= inputs.sinkSize.value.y/(inputs.sinkSize.value.y+intervY)) ModmY++;
+    if (ModminY-(float)ModmY/2 >= inputs.sinkSize.value.y/(inputs.sinkSize.value.y+intervY)) ModmY++;
     maxY = std::min(std::max(0.f,(inputs.pos.value.y+inputs.cursorSize.value.y/2)),0.999999f);
-    float ModmaxY = maxY/(inputs.sinkSize.value.y+intervY);
+    float ModmaxY = (float)maxY/(inputs.sinkSize.value.y+intervY);
     ModMY = std::floor(ModmaxY)*2;
-    if (ModmaxY-ModMY/2 >= inputs.sinkSize.value.y/(inputs.sinkSize.value.y+intervY)) ModMY++;
+    if (ModmaxY-(float)ModMY/2 >= inputs.sinkSize.value.y/(inputs.sinkSize.value.y+intervY)) ModMY++;
   }
 
   int nSinks = (inputs.nSinksX.value*inputs.nSinksY.value);
@@ -104,7 +104,7 @@ void MBAP::operator()(halp::tick t)
     }
   }
   volumes = rollOffArray(volumes);
-  //if (inputs.weights.value.size() > 0) volumes = mult(volumes, inputs.weights.value[inputs.systemNumber.value]);
+  if (inputs.weights.value.size() > 0) volumes = mult(volumes, inputs.weights.value[inputs.systemNumber.value-1]);
   //volumes = mult(volumes, inputs.gain.value);
   //vols = vols.concat(volumes);
   //outputs.weights.value[0] = inputs.pos.value.x;
