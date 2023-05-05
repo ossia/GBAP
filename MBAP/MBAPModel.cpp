@@ -12,23 +12,26 @@ void MBAP::operator()(halp::tick t)
   int ModmX{0},  ModMX{0},
       ModmY{0},  ModMY{0};
 
+  float posX = inputs.pos.value.x;
+  float posY = 1.f-inputs.pos.value.y;
+
   if (inputs.nSinksX.value>1){
-    minX = std::min(std::max(0.f,(inputs.pos.value.x-inputs.cursorSize.value.x/2)),0.999999f);
+    minX = std::min(std::max(0.f,(posX-inputs.cursorSize.value.x/2)),0.999999f);
     float ModminX = (float)minX/(inputs.sinkSize.value.x+intervX);
     ModmX = std::floor(ModminX)*2;
     if (ModminX-(float)ModmX/2 >= inputs.sinkSize.value.x/(inputs.sinkSize.value.x+intervX)) ModmX++;
-    maxX = std::min(std::max(0.f, inputs.pos.value.x+inputs.cursorSize.value.x/2),0.999999f);
+    maxX = std::min(std::max(0.f, posX+inputs.cursorSize.value.x/2),0.999999f);
     float ModmaxX = (float)maxX/(inputs.sinkSize.value.x+intervX);
     ModMX = std::floor(ModmaxX)*2;
     if (ModmaxX-(float)ModMX/2 >= inputs.sinkSize.value.x/(inputs.sinkSize.value.x+intervX)) ModMX++;
   }
 
   if (inputs.nSinksY.value>1){
-    minY = std::min(std::max(0.f,(inputs.pos.value.y-inputs.cursorSize.value.y/2)),0.999999f);
+    minY = std::min(std::max(0.f,(posY-inputs.cursorSize.value.y/2)),0.999999f);
     float ModminY = (float)minY/(inputs.sinkSize.value.y+intervY);
     ModmY = std::floor(ModminY)*2;
     if (ModminY-(float)ModmY/2 >= inputs.sinkSize.value.y/(inputs.sinkSize.value.y+intervY)) ModmY++;
-    maxY = std::min(std::max(0.f,(inputs.pos.value.y+inputs.cursorSize.value.y/2)),0.999999f);
+    maxY = std::min(std::max(0.f,(posY+inputs.cursorSize.value.y/2)),0.999999f);
     float ModmaxY = (float)maxY/(inputs.sinkSize.value.y+intervY);
     ModMY = std::floor(ModmaxY)*2;
     if (ModmaxY-(float)ModMY/2 >= inputs.sinkSize.value.y/(inputs.sinkSize.value.y+intervY)) ModMY++;
@@ -107,8 +110,8 @@ void MBAP::operator()(halp::tick t)
   if (inputs.weights.value.size() > 0) volumes = mult(volumes, inputs.weights.value[inputs.systemNumber.value-1]);
   //volumes = mult(volumes, inputs.gain.value);
   //vols = vols.concat(volumes);
-  //outputs.weights.value[0] = inputs.pos.value.x;
-  //outputs.weights.value[1] = inputs.pos.value.y;
+  //outputs.weights.value[0] = posX;
+  //outputs.weights.value[1] = posY;
   outputs.weights.value = volumes;
 }
 }
