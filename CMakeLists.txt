@@ -21,6 +21,8 @@ avnd_score_plugin_add(
     MBAP/MBAP.hpp
     MBAP/MBAPModel.hpp
     MBAP/MBAPModel.cpp
+    MBAP/GridWidget.hpp
+    MBAP/GridWidget.cpp
     MBAP/MBAPUi.hpp
   TARGET MBAP
   MAIN_CLASS MBAP

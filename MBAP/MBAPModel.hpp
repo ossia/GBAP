@@ -4,6 +4,7 @@
 #include <halp/controls.hpp>
 #include <halp/meta.hpp>
 #include <halp/sample_accurate_controls.hpp>
+
 #include <vector>
 
 namespace Example
@@ -24,38 +25,48 @@ public:
   {
     halp::val_port<"Input Weights", std::vector<float>> weights;
     halp::knob_f32<"Gain", halp::range{.min = 0., .max = 10., .init = 0.5}> gain;
-    struct : halp::knob_f32<"RollOff", halp::range{.min = -12., .max = 24., .init = 0}> {
-      void update(MBAP& self)
-      {
-        self.rollOffV = exp(value / 8.6858);
-      }
+    struct : halp::knob_f32<"RollOff", halp::range{.min = -12., .max = 24., .init = 0}>
+    {
+      void update(MBAP& self) { self.rollOffV = exp(value / 8.6858); }
     } rolloff;
     halp::toggle<"Normalize"> normalize;
-    struct : halp::spinbox_i32<"Sink X # ", halp::range{.min = 1, .max = 12., .init = 5}> {
+    struct : halp::spinbox_i32<"Sink X # ", halp::range{.min = 1, .max = 12., .init = 5}>
+    {
       void update(MBAP& self)
       {
-        self.intervX = (value>1)?(1-self.inputs.sinkSize.value.x)/(value-1)-self.inputs.sinkSize.value.x : 0;
-        self.outputs.weights.value.resize(value*self.inputs.nSinksY.value);
+        self.intervX = (value > 1) ? (1 - self.inputs.sinkSize.value.x) / (value - 1)
+                                         - self.inputs.sinkSize.value.x
+                                   : 0;
+        self.outputs.weights.value.resize(value * self.inputs.nSinksY.value);
       }
     } nSinksX;
-    struct : halp::spinbox_i32<"Sink Y # ", halp::range{.min = 1, .max = 12., .init = 4}> {
+    struct : halp::spinbox_i32<"Sink Y # ", halp::range{.min = 1, .max = 12., .init = 4}>
+    {
       void update(MBAP& self)
       {
-
-        self.intervY = (value>1)?(1-self.inputs.sinkSize.value.y)/(value-1)-self.inputs.sinkSize.value.y : 0;
-        self.outputs.weights.value.resize(value*self.inputs.nSinksX.value);
+        self.intervY = (value > 1) ? (1 - self.inputs.sinkSize.value.y) / (value - 1)
+                                         - self.inputs.sinkSize.value.y
+                                   : 0;
+        self.outputs.weights.value.resize(value * self.inputs.nSinksX.value);
       }
     } nSinksY;
     halp::spinbox_i32<"System Number", halp::range{0, 12, 0}> systemNumber;
-    struct : halp::xy_spinboxes_f32<"Sink Size", halp::range{.min = 0, .max = 1., .init = 0.05}>{
+    struct
+        : halp::xy_spinboxes_f32<
+              "Sink Size", halp::range{.min = 0, .max = 1., .init = 0.05}>
+    {
       void update(MBAP& self)
       {
-      self.intervX = (self.inputs.nSinksX.value>1)?(1-value.x)/(self.inputs.nSinksX.value-1)-value.x : 0;
-      self.intervY = (self.inputs.nSinksY.value>1)?(1-value.y)/(self.inputs.nSinksY.value-1)-value.y : 0;
+        self.intervX = (self.inputs.nSinksX.value > 1)
+                           ? (1 - value.x) / (self.inputs.nSinksX.value - 1) - value.x
+                           : 0;
+        self.intervY = (self.inputs.nSinksY.value > 1)
+                           ? (1 - value.y) / (self.inputs.nSinksY.value - 1) - value.y
+                           : 0;
       }
-    }
-    sinkSize;
-    halp::xy_spinboxes_f32<"Cursor Size", halp::range{.min = 0, .max = 1., .init = 0.04}> cursorSize;
+    } sinkSize;
+    halp::xy_spinboxes_f32<"Cursor Size", halp::range{.min = 0, .max = 1., .init = 0.04}>
+        cursorSize;
     halp::xy_pad_f32<"Position", halp::range{.min = 0., .max = 1., .init = 0.5}> pos;
 
   } inputs;
@@ -79,37 +90,15 @@ public:
   void operator()(halp::tick t);
 
   // UI is defined in another file to keep things clear.
-////  struct ui;
+  struct ui;
 
-  float intervX, intervY;
+  float intervX{}, intervY{};
   std::vector<float> volumes;
   int nSinksprev{0};
-  float rollOffV {1.};
+  float rollOffV{1.};
 
-  std::vector<float> rollOffArray(std::vector<float>& arr){
-    int len = arr.size();
-    float sum = 0;
-    while (len--) {
-      sum += arr[len];
-    }
-    if (sum !=0){
-      len = arr.size();
-      while (len--) {
-        arr[len] = pow((arr[len] / sum), rollOffV/2);
-      }
-    }
-    return arr;
-  };
-
-  std::vector<float> mult(std::vector<float>& arr, float scal) {
-    int len = arr.size();
-    while (len--)
-      arr[len] = arr[len] *= scal;
-    return arr;
-  };
-
-
-
+  void rollOffArray(std::vector<float>& arr);
+  void mult(std::vector<float>& arr, float scal);
 };
 
 }
