@@ -6,7 +6,7 @@ namespace Example
 void matrix::operator()(halp::tick t)
 {
   // Update the output audio channel count if this changed
-  int out_channels = inputs.outs.value;
+  int out_channels = inputs.outs.value + inputs.offs.value ;
   if(out_channels != this->prev_outs)
   {
     outputs.audio.request_channels(out_channels);
@@ -20,7 +20,8 @@ void matrix::operator()(halp::tick t)
     auto* in = inputs.audio[i];
     for(int k = 0; k < outputs.audio.channels; k++)
     {
-      auto weight = (inputs.weights.value.size() > k)
+      auto weight = (k < inputs.offs.value ) ? 0.f :
+                    (inputs.weights.value.size() > k)
                         ? inputs.weights.value[k]
                         : inputs.weights.value[inputs.weights.value.size() - 1];
 
