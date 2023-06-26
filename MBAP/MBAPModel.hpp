@@ -50,6 +50,7 @@ public:
         self.outputs.weights.value.resize(value * self.inputs.nSinksX.value);
       }
     } nSinksY;
+    halp::spinbox_i32<"Source # ", halp::range{.min = 1, .max = 12., .init = 2}> nSources;
     halp::spinbox_i32<"System Number", halp::range{0, 12, 0}> systemNumber;
     struct
         : halp::xy_spinboxes_f32<
