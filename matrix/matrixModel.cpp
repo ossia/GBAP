@@ -14,7 +14,7 @@ void matrix::operator()(halp::tick t)
     return;
   }
 
-  // Apply the matrix to the audio input
+  // Apply the matrix to the audio inputz
   for(int i = 0; i < inputs.audio.channels; i++)
   {
     auto* in = inputs.audio[i];

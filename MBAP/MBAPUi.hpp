@@ -24,7 +24,7 @@ struct MBAP::ui
     halp::control<&ins::nSinksY> sy;
     halp::item<&ins::systemNumber> snum;
     halp::item<&ins::sinkSize> sinkSize;
-    halp::item<&ins::cursorSize> cursorSize;
+    halp::control<&ins::cursorSize> cursorSize; //change from item to control
   } controls;
 
   halp::custom_control<mbap::GridWidget, &ins::pos> area;
@@ -33,6 +33,7 @@ struct MBAP::ui
   {
     this->area.columns = controls.sx.value;
     this->area.rows = controls.sy.value;
+    this->area.setCursorSize(controls.cursorSize.value); //called setCursorSize method
   }
 };
 }

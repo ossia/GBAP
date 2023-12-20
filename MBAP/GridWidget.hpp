@@ -16,6 +16,7 @@ struct GridWidget
   int columns{3};
   int rows{2};
 
+  halp::xy_type<float> cursorSize{10, 10}; // Change cursorSize to xy_type<float>
 
   void paint(auto ctx)
   {
@@ -47,9 +48,17 @@ struct GridWidget
     // Draw the cursor
     ctx.begin_path();
     ctx.set_fill_color({90, 90, 90, 255});
-    ctx.draw_rect(value.x * width(), value.y * height(), 10, 10);
+    // Adjust position of the cursor to be centered on the x and y coordinates
+    ctx.draw_rect(value.x * width() - cursorSize.x / 2, value.y * height() - cursorSize.y / 2, cursorSize.x, cursorSize.y);
     ctx.fill();
   }
+
+
+  void setCursorSize(halp::xy_type<float> size) // Change the type to xy_type<float>
+  {
+    cursorSize = size;
+  }
+
 
   bool mouse_press(double x, double y)
   {
