@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: [ 3.0.8 ]
+        version: [ 3.1.11 ]
         config:
           - {
               name: "Windows",
@@ -33,7 +33,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: "recursive"
 
@@ -91,7 +91,7 @@ jobs:
         if: matrix.config.name == 'Ubuntu'
         shell: bash
         run: |
-          sudo apt -y install xvfb libasound2 libxcb1 libegl1 libgl1-mesa-dev libegl1-mesa-dev libglvnd0 libx11-6 libxcb-glx0 libgl1 libdbus-1-3 libxcb-xkb1 libxkbcommon-x11-0 libxcb-xkb1
+          sudo apt -y install xvfb libasound2 libxcb1 libegl1 libgl1-mesa-dev libegl1-mesa-dev libglvnd0 libx11-6 libxcb-glx0 libgl1 libdbus-1-3 libxcb-xkb1 libxkbcommon-x11-0 libxcb-xkb1 libfuse2
           SCORE_FILENAME=ossia.score-${{ matrix.version }}-${{ matrix.config.score }}
           chmod +x $SCORE_FILENAME
 
@@ -126,7 +126,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: "recursive"
 
@@ -185,7 +185,7 @@ jobs:
         if: matrix.config.name == 'Ubuntu'
         shell: bash
         run: |
-          sudo apt -y install xvfb libasound2 libxcb1 libegl1 libgl1-mesa-dev libegl1-mesa-dev libglvnd0 libx11-6 libxcb-glx0 libgl1 libdbus-1-3 libxcb-xkb1 libxkbcommon-x11-0 libxcb-xkb1
+          sudo apt -y install xvfb libasound2 libxcb1 libegl1 libgl1-mesa-dev libegl1-mesa-dev libglvnd0 libx11-6 libxcb-glx0 libgl1 libdbus-1-3 libxcb-xkb1 libxkbcommon-x11-0 libxcb-xkb1 libfuse2
           SCORE_FILENAME=ossia.score-master-${{ matrix.config.score }}
           export SCORE_JIT_SDK="$PWD/sdk/usr"
           chmod +x $SCORE_FILENAME
