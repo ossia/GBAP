@@ -1,4 +1,4 @@
-#include "MBAP.hpp"
+#include "GBAP.hpp"
 
 #include <QDebug>
 
@@ -6,7 +6,7 @@
 
 namespace Example
 {
-void MBAP::operator()(halp::tick t)
+void GBAP::operator()(halp::tick t)
 {
   float minX{0}, maxX{1}, minY{0}, maxY{1};
   int ModmX{0}, ModMX{0}, ModmY{0}, ModMY{0};
@@ -168,7 +168,7 @@ void MBAP::operator()(halp::tick t)
   }
 }
 
-void MBAP::rollOffArray(std::vector<float>& arr)
+void GBAP::rollOffArray(std::vector<float>& arr)
 {
   if(rollOffV <= 0.)
     return;
@@ -182,7 +182,7 @@ void MBAP::rollOffArray(std::vector<float>& arr)
   }
 }
 
-void MBAP::mult(std::vector<float>& arr, float scal)
+void GBAP::mult(std::vector<float>& arr, float scal)
 {
   for(float& f : arr)
     f *= scal;

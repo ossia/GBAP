@@ -10,12 +10,12 @@
 namespace Example
 {
 
-class MBAP
+class GBAP
 {
 public:
-  halp_meta(name, "MBAP")
+  halp_meta(name, "GBAP")
   halp_meta(category, "Control/Spatialization")
-  halp_meta(c_name, "MBAP")
+  halp_meta(c_name, "GBAP")
   halp_meta(uuid, "81DB0C30-175B-422E-8C5F-87569D50548E")
 
   // Define inputs and outputs ports.
@@ -27,12 +27,12 @@ public:
     halp::knob_f32<"Gain", halp::range{.min = 0., .max = 10., .init = 0.5}> gain;
     struct : halp::knob_f32<"RollOff", halp::range{.min = -12., .max = 24., .init = 0}>
     {
-      void update(MBAP& self) { self.rollOffV = exp(value / 8.6858); }
+      void update(GBAP& self) { self.rollOffV = exp(value / 8.6858); }
     } rolloff;
     halp::toggle<"Normalize"> normalize;
     struct : halp::spinbox_i32<"Sink X # ", halp::range{.min = 1, .max = 12., .init = 5}>
     {
-      void update(MBAP& self)
+      void update(GBAP& self)
       {
         self.intervX = (value > 1) ? (1 - self.inputs.sinkSize.value.x) / (value - 1)
                                          - self.inputs.sinkSize.value.x
@@ -42,7 +42,7 @@ public:
     } nSinksX;
     struct : halp::spinbox_i32<"Sink Y # ", halp::range{.min = 1, .max = 12., .init = 4}>
     {
-      void update(MBAP& self)
+      void update(GBAP& self)
       {
         self.intervY = (value > 1) ? (1 - self.inputs.sinkSize.value.y) / (value - 1)
                                          - self.inputs.sinkSize.value.y
@@ -56,7 +56,7 @@ public:
         : halp::xy_spinboxes_f32<
               "Sink Size", halp::range{.min = 0, .max = 1., .init = 0.05}>
     {
-      void update(MBAP& self)
+      void update(GBAP& self)
       {
         self.intervX = (self.inputs.nSinksX.value > 1)
                            ? (1 - value.x) / (self.inputs.nSinksX.value - 1) - value.x

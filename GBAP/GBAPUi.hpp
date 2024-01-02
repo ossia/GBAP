@@ -1,11 +1,11 @@
 #pragma once
-#include <MBAP/GridWidget.hpp>
-#include <MBAP/MBAPModel.hpp>
+#include <GBAP/GridWidget.hpp>
+#include <GBAP/GBAPModel.hpp>
 #include <halp/layout.hpp>
 namespace Example
 {
 
-struct MBAP::ui
+struct GBAP::ui
 {
   using enum halp::colors;
   using enum halp::layouts;
