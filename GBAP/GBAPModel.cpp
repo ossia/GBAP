@@ -14,7 +14,7 @@ void GBAP::operator()(halp::tick t)
   for (int i = 0; i<inputs.nSources; i++){
 
     float posX = inputs.pos.value.x;
-    float posY = 1.f-inputs.pos.value.y;
+    float posY = inputs.pos.value.y;
 
     const auto cursorSize = inputs.sinkSize.value;
     const auto sinkSize = inputs.sinkSize.value;

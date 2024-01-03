@@ -16,6 +16,7 @@ struct GridWidget
   int columns{3};
   int rows{2};
 
+  halp::xy_type<float> sinkSize{10, 10};
   halp::xy_type<float> cursorSize{10, 10}; // Change cursorSize to xy_type<float>
 
   void paint(auto ctx)
@@ -31,15 +32,15 @@ struct GridWidget
     {
       ctx.set_fill_color({60, 60, 60, 255});
       ctx.begin_path();
-      const auto rect_width = 0.9 * width() / columns;
-      const auto rect_height = 0.9 * height() / rows;
+      const auto rect_width = sinkSize.x * width();
+      const auto rect_height = sinkSize.y * height();
       for(int x = 0; x < columns; x++)
       {
         for(int y = 0; y < rows; y++)
         {
           const auto xpos = x * width() / columns;
           const auto ypos = y * height() / rows;
-          ctx.draw_rect(xpos, ypos, rect_width, rect_height);
+          ctx.draw_rect(xpos, ypos, cursorSize.x * width(), cursorSize.y * height());
         }
       }
       ctx.fill();
@@ -54,6 +55,10 @@ struct GridWidget
   }
 
 
+  void setSinkSize(halp::xy_type<float> size) // Change the type to xy_type<float>
+  {
+    sinkSize = size;
+  }
   void setCursorSize(halp::xy_type<float> size) // Change the type to xy_type<float>
   {
     cursorSize = size;
