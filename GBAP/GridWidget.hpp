@@ -13,11 +13,12 @@ struct GridWidget
   static constexpr double width() { return 400.; }
   static constexpr double height() { return 400.; }
 
-  int columns{3};
-  int rows{2};
+  int columns{4};
+  int rows{4};
 
-  halp::xy_type<float> sinkSize{10, 10};
-  halp::xy_type<float> cursorSize{10, 10}; // Change cursorSize to xy_type<float>
+  halp::xy_type<float> sinkSize{0.1, 0.1};
+  halp::xy_type<float> cursorSize{0.1, 0.1};
+  halp::xy_type<float> intervSize{0.2, 0.2};
 
   void paint(auto ctx)
   {
