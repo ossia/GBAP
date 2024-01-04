@@ -16,8 +16,8 @@ void GBAP::operator()(halp::tick t)
     float posX = inputs.pos.value.x;
     float posY = inputs.pos.value.y;
 
-    if(static int c=0; c++ % 10 == 0)
-      qDebug() << posX << " / " << posY;
+    //if(static int c=0; c++ % 10 == 0)
+       //qDebug() << posX << " / " << posY;
 
     const auto cursorSize = inputs.sinkSize.value;
     const auto sinkSize = inputs.sinkSize.value;

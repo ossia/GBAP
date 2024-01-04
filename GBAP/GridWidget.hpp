@@ -22,11 +22,11 @@ struct GridWidget
 
   void paint(auto ctx)
   {
-    // Draw the background
-    // ctx.set_fill_color({120, 120, 120, 255});
-    // ctx.begin_path();
-    // ctx.draw_rect(0., 0., width(), height());
-    // ctx.fill();
+    //Draw the background
+    ctx.set_fill_color({10, 10, 10, 255});
+    ctx.begin_path();
+    ctx.draw_rect(0., 0., width(), height());
+    ctx.fill();
 
     // Draw the grid
     if(columns > 0 && rows > 0)
@@ -39,9 +39,9 @@ struct GridWidget
       {
         for(int y = 0; y < rows; y++)
         {
-          const auto xpos = x * width() / columns;
-          const auto ypos = y * height() / rows;
-          ctx.draw_rect(xpos, ypos, cursorSize.x * width(), cursorSize.y * height());
+          const auto xpos = x * (rect_width  + intervSize.x * width());
+          const auto ypos = y * (rect_height + intervSize.y * height());
+          ctx.draw_rect(xpos, ypos, rect_width, rect_height);
         }
       }
       ctx.fill();
@@ -49,9 +49,9 @@ struct GridWidget
 
     // Draw the cursor
     ctx.begin_path();
-    ctx.set_fill_color({90, 90, 90, 255});
+    ctx.set_fill_color({0, 0, 255, 255});
     // Adjust position of the cursor to be centered on the x and y coordinates
-    ctx.draw_rect(value.x * width() - cursorSize.x / 2, value.y * height() - cursorSize.y / 2, cursorSize.x, cursorSize.y);
+    ctx.draw_rect((value.x - cursorSize.x / 2) * width(), (value.y - cursorSize.y / 2) * height() , cursorSize.x * width(), cursorSize.y * height());
     ctx.fill();
   }
 
@@ -59,10 +59,20 @@ struct GridWidget
   void setSinkSize(halp::xy_type<float> size) // Change the type to xy_type<float>
   {
     sinkSize = size;
+    calcInterv();
   }
   void setCursorSize(halp::xy_type<float> size) // Change the type to xy_type<float>
   {
     cursorSize = size;
+    calcInterv();
+  }
+
+  void calcInterv()
+  {
+    intervSize.x = (columns-1) ?
+                   (1-sinkSize.x)/(columns-1)-sinkSize.x : 0;
+    intervSize.y = (rows-1) ?
+                   (1-sinkSize.y)/(rows-1)-sinkSize.y : 0;
   }
 
 
