@@ -38,6 +38,7 @@ public:
                                          - self.inputs.sinkSize.value.x
                                    : 0;
         self.outputs.weights.value.resize(value * self.inputs.nSinksY.value);
+        qDebug() << " interv X: " << self.intervX ;
       }
     } nSinksX;
     struct : halp::spinbox_i32<"Sink Y # ", halp::range{.min = 1, .max = 12., .init = 4}>
@@ -48,6 +49,7 @@ public:
                                          - self.inputs.sinkSize.value.y
                                    : 0;
         self.outputs.weights.value.resize(value * self.inputs.nSinksX.value);
+        qDebug() << " interv Y: " << self.intervY ;
       }
     } nSinksY;
     halp::spinbox_i32<"Source # ", halp::range{.min = 1, .max = 12., .init = 2}> nSources;
