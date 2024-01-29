@@ -1,34 +1,37 @@
-cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.24 FATAL_ERROR)
 
 if(NOT TARGET score_lib_base)
   include(ScoreExternalAddon)
 endif()
 
-include(ScoreAvndHelper)
+if(NOT TARGET score_plugin_avnd)
+  return()
+endif()
 
-project(score_addon_mbap LANGUAGES CXX)
+project(score_addon_gbap LANGUAGES CXX)
 
-
-###### MBAP ############
+###### GBAP ############
 
 avnd_score_plugin_init(
-  BASE_TARGET score_addon_mbap
+  BASE_TARGET score_addon_gbap
 )
 
 avnd_score_plugin_add(
-  BASE_TARGET score_addon_mbap
+  BASE_TARGET score_addon_gbap
   SOURCES
-    MBAP/MBAP.hpp
-    MBAP/MBAPModel.hpp
-    MBAP/MBAPModel.cpp
-    MBAP/MBAPUi.hpp
-  TARGET MBAP
-  MAIN_CLASS MBAP
+    GBAP/GBAP.hpp
+    GBAP/GBAPModel.hpp
+    GBAP/GBAPModel.cpp
+    GBAP/GridWidget.hpp
+    GBAP/GridWidget.cpp
+    GBAP/GBAPUi.hpp
+  TARGET GBAP
+  MAIN_CLASS GBAP
   NAMESPACE Example
 )
 
 avnd_score_plugin_add(
-  BASE_TARGET score_addon_mbap
+  BASE_TARGET score_addon_gbap
   SOURCES
     matrix/matrix.hpp
     matrix/matrixModel.hpp
@@ -40,7 +43,7 @@ avnd_score_plugin_add(
 )
 
 avnd_score_plugin_finalize(
-  BASE_TARGET score_addon_mbap
+  BASE_TARGET score_addon_gbap
   PLUGIN_VERSION 1
   PLUGIN_UUID "1057641E-4253-4BD3-802B-09F063FF559C"
 )

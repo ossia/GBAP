@@ -3,6 +3,7 @@
 #include <halp/audio.hpp>
 #include <halp/controls.hpp>
 #include <halp/meta.hpp>
+
 #include <vector>
 
 namespace Example
@@ -21,17 +22,21 @@ public:
   struct ins
   {
     halp::dynamic_audio_bus<"Input", double> audio;
-    //halp::dynamic_audio_bus<"Input", double> weights;
+
     halp::val_port<"Weights", std::vector<float>> weights;
     halp::knob_f32<"Gain", halp::range{.min = 0., .max = 10., .init = 1.}> gain;
+    halp::spinbox_i32<"Channel offset", halp::irange{.min = 0, .max = 128, .init = 1}>
+        offs;
+    halp::spinbox_i32<"Audio outs", halp::irange{.min = 0, .max = 128, .init = 1}> outs;
   } inputs;
 
   struct
   {
-    halp::dynamic_audio_bus<"Output", double> audio;
+    halp::variable_audio_bus<"Output", double> audio;
   } outputs;
 
   using setup = halp::setup;
+  int prev_outs = -1;
   void prepare(halp::setup info)
   {
     // Initialization, this method will be called with buffer size, etc.
