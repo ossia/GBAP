@@ -24,8 +24,8 @@ public:
   struct ins
   {
     halp::val_port<"Input Weights", std::vector<float>> weights;
-    halp::knob_f32<"Gain", halp::range{.min = 0., .max = 10., .init = 0.5}> gain;
-    struct : halp::knob_f32<"RollOff", halp::range{.min = -12., .max = 24., .init = 0}>
+    halp::knob_f32<"Gain", halp::range{.min = 0., .max = 1., .init = 1.}> gain;
+    struct : halp::knob_f32<"RollOff", halp::range{.min = 0., .max = 127., .init = 6}>
     {
       void update(GBAP& self) { self.rollOffV = exp(value / 8.6858); }
     } rolloff;

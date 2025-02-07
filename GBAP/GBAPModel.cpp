@@ -4,6 +4,8 @@
 
 #include <algorithm>
 
+#include "GBAPModel.hpp"
+
 namespace Example
 {
 void GBAP::operator()(halp::tick t)
@@ -19,7 +21,7 @@ void GBAP::operator()(halp::tick t)
     //if(static int c=0; c++ % 10 == 0)
        //qDebug() << posX << " / " << posY;
 
-    const auto cursorSize = inputs.sinkSize.value;
+    const auto cursorSize = inputs.cursorSize.value;
     const auto sinkSize = inputs.sinkSize.value;
 
     if(inputs.nSinksX.value > 1)
@@ -109,7 +111,7 @@ void GBAP::operator()(halp::tick t)
             }
             break;
           case 2:
-            if(inputs.nSinksX.value > 1)
+            if(inputs.nSinksY.value > 1)
             {
               Ym = ((sinkSize.y + intervY) * (y - 1) + 2 * sinkSize.y) / 2;
               Xs = std::max(minX, (sinkSize.x + intervX) * x / 2);
