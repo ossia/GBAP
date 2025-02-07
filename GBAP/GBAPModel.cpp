@@ -4,8 +4,6 @@
 
 #include <algorithm>
 
-#include "GBAPModel.hpp"
-
 namespace Example
 {
 void GBAP::operator()(halp::tick t)
