@@ -158,6 +158,9 @@ void GBAP::operator()(halp::tick t)
       }
     }
     rollOffArray(volumes);
+    if (inputs.normalize){
+      normalizeArray(volumes);
+    }
 
     const float gain = inputs.gain.value
                        * ((inputs.weights.value.size() > 0)
@@ -190,5 +193,16 @@ void GBAP::mult(std::vector<float>& arr, float scal)
   for(float& f : arr)
     f *= scal;
 }
-}
 
+void GBAP::normalizeArray(std::vector<float>& arr){
+
+  float max = *std::max_element(arr.begin(), arr.end());
+
+  if (max != 0){
+    for(float& f : arr){
+      f /= max;
+    }
+  }
+
+}
+}

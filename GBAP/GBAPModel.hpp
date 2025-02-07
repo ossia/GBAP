@@ -102,6 +102,7 @@ public:
 
   void rollOffArray(std::vector<float>& arr);
   void mult(std::vector<float>& arr, float scal);
+  void normalizeArray(std::vector<float>& arr);
 };
 
 }
