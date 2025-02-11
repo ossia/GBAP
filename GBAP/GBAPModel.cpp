@@ -196,6 +196,9 @@ void GBAP::mult(std::vector<float>& arr, float scal)
 
 void GBAP::normalizeArray(std::vector<float>& arr){
 
+  if(arr.empty())
+    return;
+
   float max = *std::max_element(arr.begin(), arr.end());
 
   if (max != 0){
