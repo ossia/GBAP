@@ -19,7 +19,7 @@ void GBAP::operator()(halp::tick t)
     //if(static int c=0; c++ % 10 == 0)
        //qDebug() << posX << " / " << posY;
 
-    const auto cursorSize = inputs.sinkSize.value;
+    const auto cursorSize = inputs.cursorSize.value;
     const auto sinkSize = inputs.sinkSize.value;
 
     if(inputs.nSinksX.value > 1)
@@ -109,7 +109,7 @@ void GBAP::operator()(halp::tick t)
             }
             break;
           case 2:
-            if(inputs.nSinksX.value > 1)
+            if(inputs.nSinksY.value > 1)
             {
               Ym = ((sinkSize.y + intervY) * (y - 1) + 2 * sinkSize.y) / 2;
               Xs = std::max(minX, (sinkSize.x + intervX) * x / 2);
@@ -158,6 +158,9 @@ void GBAP::operator()(halp::tick t)
       }
     }
     rollOffArray(volumes);
+    if (inputs.normalize){
+      normalizeArray(volumes);
+    }
 
     const float gain = inputs.gain.value
                        * ((inputs.weights.value.size() > 0)
@@ -190,5 +193,19 @@ void GBAP::mult(std::vector<float>& arr, float scal)
   for(float& f : arr)
     f *= scal;
 }
-}
 
+void GBAP::normalizeArray(std::vector<float>& arr){
+
+  if(arr.empty())
+    return;
+
+  float max = *std::max_element(arr.begin(), arr.end());
+
+  if (max != 0){
+    for(float& f : arr){
+      f /= max;
+    }
+  }
+
+}
+}
