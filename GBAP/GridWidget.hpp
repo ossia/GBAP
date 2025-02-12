@@ -28,13 +28,17 @@ struct GridWidget
     ctx.draw_rect(0., 0., width(), height());
     ctx.fill();
 
+    intervSize.x =  intervSize.x > 0 ? intervSize.x : 0;
+    intervSize.y =  intervSize.y > 0 ? intervSize.y : 0;
+
     // Draw the grid
     if(columns > 0 && rows > 0)
     {
       ctx.set_fill_color({60, 60, 60, 255});
       ctx.begin_path();
-      const auto rect_width = columns==1 ? width():sinkSize.x * width();
-      const auto rect_height = rows==1? height():sinkSize.y * height();
+
+      const auto rect_width = columns==1 ? width(): sinkSize.x * width();
+      const auto rect_height = rows==1? height(): sinkSize.y * height();
       for(int x = 0; x < columns; x++)
       {
         for(int y = 0; y < rows; y++)
