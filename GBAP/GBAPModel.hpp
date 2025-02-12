@@ -61,10 +61,10 @@ public:
       void update(GBAP& self)
       {
         self.intervX = (self.inputs.nSinksX.value > 1)
-                           ? (1 - value.x) / (self.inputs.nSinksX.value - 1) - value.x
+                           ? std::max(0.f,(1 - value.x) / (self.inputs.nSinksX.value - 1) - value.x)
                            : 0;
         self.intervY = (self.inputs.nSinksY.value > 1)
-                           ? (1 - value.y) / (self.inputs.nSinksY.value - 1) - value.y
+                           ? std::max(0.f,(1 - value.y) / (self.inputs.nSinksY.value - 1) - value.y)
                            : 0;
       }
     } sinkSize;
