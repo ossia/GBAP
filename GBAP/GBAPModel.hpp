@@ -1,6 +1,5 @@
 #pragma once
 
-#include <QDebug>
 #include <halp/audio.hpp>
 #include <halp/controls.hpp>
 #include <halp/meta.hpp>
