@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QDebug>
 #include <halp/audio.hpp>
 #include <halp/controls.hpp>
 #include <halp/meta.hpp>
@@ -25,7 +26,7 @@ public:
   {
     halp::val_port<"Input Weights", std::vector<float>> weights;
     halp::knob_f32<"Gain", halp::range{.min = 0., .max = 1., .init = 1.}> gain;
-    struct : halp::knob_f32<"RollOff", halp::range{.min = 0., .max = 127., .init = 6}>
+    struct : halp::knob_f32<"RollOff", halp::range{.min = 0., .max = 24., .init = 6}>
     {
       void update(GBAP& self) { self.rollOffV = exp(value / 8.6858); }
     } rolloff;
