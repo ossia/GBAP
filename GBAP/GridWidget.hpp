@@ -28,8 +28,8 @@ struct GridWidget
     ctx.draw_rect(0., 0., width(), height());
     ctx.fill();
 
-    intervSize.x =  intervSize.x > 0 ? intervSize.x : 0;
-    intervSize.y =  intervSize.y > 0 ? intervSize.y : 0;
+    intervSize.x = std::max(0.f,intervSize.x);
+    intervSize.y = std::max(0.f,intervSize.y);
 
     // Draw the grid
     if(columns > 0 && rows > 0)
