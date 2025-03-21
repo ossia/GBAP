@@ -42,6 +42,30 @@ avnd_score_plugin_add(
   NAMESPACE Example
 )
 
+avnd_score_plugin_add(
+  BASE_TARGET score_addon_gbap
+  SOURCES
+    MultiCursor/MultiCursor.hpp
+    MultiCursor/MultiCursorModel.hpp
+    MultiCursor/MultiCursorModel.cpp
+  TARGET multicursormanager
+  MAIN_CLASS MultiCursorManager
+  NAMESPACE Example
+)
+
+avnd_score_plugin_add(
+  BASE_TARGET score_addon_gbap
+  SOURCES
+    PathGenerator/PathGenerator.hpp
+    PathGenerator/PathGeneratorModel.hpp
+    PathGenerator/PathGeneratorModel.cpp
+    PathGenerator/PathGeneratorUi.hpp
+  TARGET pathgenerator
+  MAIN_CLASS PathGenerator
+  NAMESPACE Example
+)
+
+
 avnd_score_plugin_finalize(
   BASE_TARGET score_addon_gbap
   PLUGIN_VERSION 1
