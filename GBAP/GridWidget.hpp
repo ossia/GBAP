@@ -28,8 +28,8 @@ struct GridWidget
     ctx.draw_rect(0., 0., width(), height());
     ctx.fill();
 
-    intervSize.x =  intervSize.x > 0 ? intervSize.x : 0;
-    intervSize.y =  intervSize.y > 0 ? intervSize.y : 0;
+    intervSize.x = std::max(0.f,intervSize.x);
+    intervSize.y = std::max(0.f,intervSize.y);
 
     // Draw the grid
     if(columns > 0 && rows > 0)
@@ -90,7 +90,7 @@ struct GridWidget
   void mouse_move(double x, double y)
   {
     // const double res = std::clamp(x / width(), 0., 1.);
-    transaction.update({(float)(x / width()), (float)(y / height())});
+    transaction.update({(float)std::clamp((x / width()),0.,1.), (float)std::clamp((y / height()),0.,1.)});
   }
 
   void mouse_release(double x, double y)
