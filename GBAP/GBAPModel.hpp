@@ -24,6 +24,7 @@ public:
   struct ins
   {
     halp::val_port<"Input Weights", std::vector<float>> weights;
+    halp::val_port<"Input Multicursor", std::vector<ossia::vec2f>> MultiTab;
     halp::knob_f32<"Gain", halp::range{.min = 0., .max = 1., .init = 1.}> gain;
     struct : halp::knob_f32<"RollOff", halp::range{.min = 0., .max = 24., .init = 6}>
     {
@@ -74,7 +75,7 @@ public:
 
   struct
   {
-    halp::val_port<"Output Weights", std::vector<float>> weights;
+    halp::val_port<"Output Weights", std::vector<ossia::value>> weights;
   } outputs;
 
   using setup = halp::setup;
@@ -94,13 +95,15 @@ public:
   struct ui;
 
   float intervX{}, intervY{};
-  std::vector<float> volumes;
+
+  std::vector<ossia::value> volumes;
+
   int nSinksprev{0};
   float rollOffV{1.};
 
-  void rollOffArray(std::vector<float>& arr);
-  void mult(std::vector<float>& arr, float scal);
-  void normalizeArray(std::vector<float>& arr);
+  void rollOffArray(std::vector<ossia::value>& arr);
+  void mult(std::vector<ossia::value>& arr, float scal);
+  void normalizeArray(std::vector<ossia::value>& arr);
 };
 
 }
