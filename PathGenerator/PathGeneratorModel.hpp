@@ -13,10 +13,12 @@ class PathGenerator
 {
 public:
   halp_meta(name, "PathGenerator")
-  halp_meta(category, "Control/Spatialization")
   halp_meta(c_name, "pathgenerator")
+  halp_meta(category, "Control/Spatialization")
+  halp_meta(description, "This process generates points that move dynamically along a given trajectory.")
+  halp_meta(manual_url, "https://ossia.io/score-docs/processes/pathgenerator.html")
+  halp_meta(author, "Ahmed El Moudden")
   halp_meta(uuid, "95a53434-276a-42a3-bb6b-ee92462b9640")
-
 
   struct ins
   {
@@ -48,22 +50,14 @@ public:
   using setup = halp::setup;
   void prepare(halp::setup info)
   {
-
     for (size_t i = 0; i < inputs.pos.value.size();i++){
       outputs.OutTab.value.push_back(inputs.pos.value[i].get<std::vector<ossia::value>>()[0].get<ossia::vec2f>());
     }
-
-    // Initialization, this method will be called with buffer size, etc.
   }
 
-  // Do our processing for N samples
   using tick = halp::tick_flicks;
 
-  // Defined in the .cpp
   void operator()(const halp::tick_flicks& t);
-
-  // UI is defined in another file to keep things clear.
-  //struct ui;
 
 };
 
