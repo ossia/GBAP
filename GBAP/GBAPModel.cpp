@@ -73,6 +73,11 @@ void GBAP::operator()(halp::tick t)
       nSinksprev = nSinks;
     }
 
+    for(int i = 0; i < nSinks; i++) //Reset sinks values
+    {
+      volumes[i] = 0;
+    }
+
     for(int y = ModmY; y <= ModMY; y++)
     {
       for(int x = ModmX; x <= ModMX; x++)

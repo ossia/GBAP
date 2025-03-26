@@ -90,7 +90,7 @@ struct GridWidget
   void mouse_move(double x, double y)
   {
     // const double res = std::clamp(x / width(), 0., 1.);
-    transaction.update({(float)(x / width()), (float)(y / height())});
+    transaction.update({(float)std::clamp((x / width()),0.,1.), (float)std::clamp((y / height()),0.,1.)});
   }
 
   void mouse_release(double x, double y)
