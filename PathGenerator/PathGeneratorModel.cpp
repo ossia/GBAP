@@ -1,86 +1,73 @@
 #include "PathGenerator.hpp"
+#include <cmath>
+#include <numbers>
 
-namespace Example
-{
-void PathGenerator::operator()(const halp::tick_flicks& t)
-{
-  // Linear path
-  if (inputs.Path == 0) {
+namespace Example {
 
-    for (size_t v = 0; v < outputs.OutTab.value.size(); v++) {
-      ossia::vec2f start = inputs.pos.value[v].get<std::vector<ossia::value>>()[0].get<ossia::vec2f>();
-      ossia::vec2f end = inputs.pos.value[v].get<std::vector<ossia::value>>()[1].get<ossia::vec2f>();
+constexpr float TWO_PI = 2.0f * std::numbers::pi;
+constexpr float FOUR_PI = 4.0f * std::numbers::pi;
 
-      auto& out = outputs.OutTab.value[v].get<ossia::vec2f>();
+void PathGenerator::operator()(const halp::tick_flicks& t) {
 
-      start[1] = 1 - start[1];
-      end[1] = 1 - end[1];
+  float relativePos = fmod(t.relative_position * inputs.speed, 1.0f);
+  bool reverse = (int(t.relative_position * inputs.speed) % 2) != 0;
 
-      float relativePos = fmod(t.relative_position * inputs.speed, 1.0f);
-      if (inputs.loop) {
-        if (int(t.relative_position * inputs.speed) % 2 == 0) {
-          out[0] = start[0] + (end[0] - start[0]) * relativePos;
-          out[1] = start[1] + (end[1] - start[1]) * relativePos;
-        } else {
-          out[0] = end[0] - (end[0] - start[0]) * relativePos;
-          out[1] = end[1] - (end[1] - start[1]) * relativePos;
-        }
-      } else {
-          out[0] = start[0] + (end[0] - start[0]) * relativePos;
-          out[1] = start[1] + (end[1] - start[1]) * relativePos;
-      }
-    }
+  switch (inputs.Path) {
+    case 0: LinearPath(t, relativePos, reverse); break;
+    case 1: CirclePath(t, relativePos, reverse); break;
+    case 2: SpiralPath(t, relativePos, reverse); break;
+    default: break;
+  }
+}
 
-    // Circle path
-  } else if (inputs.Path == 1) {
-    for (size_t v = 0; v < outputs.OutTab.value.size(); v++) {
-      ossia::vec2f point = inputs.pos.value[v].get<std::vector<ossia::value>>()[0].get<ossia::vec2f>();
+void PathGenerator::LinearPath(const halp::tick_flicks& t, float relativePos, bool reverse) {
 
-      auto& out = outputs.OutTab.value[v].get<ossia::vec2f>();
+  for (size_t v = 0; v < outputs.OutTab.value.size(); v++) {
+    auto start = inputs.pos.value[v].get<std::vector<ossia::value>>()[0].get<ossia::vec2f>();
+    auto end   = inputs.pos.value[v].get<std::vector<ossia::value>>()[1].get<ossia::vec2f>();
+    auto& out  = outputs.OutTab.value[v].get<ossia::vec2f>();
 
-      point[1] = 1 - point[1];
-      float relativePos = fmod(t.relative_position * inputs.speed, 1.0f);
-
-      if (inputs.loop) {
-        if (int(t.relative_position * inputs.speed) % 2 == 0) {
-          out[0] = point[0] + inputs.radius.value.x * std::cos(t.relative_position * 2 * std::numbers::pi * inputs.speed);
-          out[1] = point[1] + inputs.radius.value.y * std::sin(t.relative_position * 2 * std::numbers::pi * inputs.speed);
-        } else {
-          out[0] = point[0] + inputs.radius.value.x * std::cos((2 * std::numbers::pi - t.relative_position * 2 * std::numbers::pi) * inputs.speed);
-          out[1] = point[1] + inputs.radius.value.y * std::sin((2 * std::numbers::pi - t.relative_position * 2 * std::numbers::pi) * inputs.speed);
-        }
-      } else {
-          out[0] = point[0] + inputs.radius.value.x * std::cos(t.relative_position * 2 * std::numbers::pi * inputs.speed);
-          out[1] = point[1] + inputs.radius.value.y * std::sin(t.relative_position * 2 * std::numbers::pi * inputs.speed);
-      }
-    }
-
-    // Spiral path
-  } else if (inputs.Path == 2) {
-    float radX = inputs.radius.value.x * fmod(t.relative_position, 1.0f);
-    float radY = inputs.radius.value.y * fmod(t.relative_position, 1.0f);
-
-    for (size_t v = 0; v < outputs.OutTab.value.size(); v++) {
-      ossia::vec2f point = inputs.pos.value[v].get<std::vector<ossia::value>>()[0].get<ossia::vec2f>();
-
-      auto& out = outputs.OutTab.value[v].get<ossia::vec2f>();
-
-      point[1] = 1 - point[1];
-      float relativePos = fmod(t.relative_position * inputs.speed, 1.0f);
-
-      if (inputs.loop) {
-        if (int(t.relative_position * inputs.speed) % 2 == 0){
-          out[0] = point[0] + radX * std::cos(relativePos * 4 * std::numbers::pi);
-          out[1] = point[1] + radY * std::sin(relativePos * 4 * std::numbers::pi);
-        } else {
-          out[0] = point[0] + (inputs.radius.value.x-radX) * std::cos((1-relativePos ) * 4 * std::numbers::pi);
-          out[1] = point[1] + (inputs.radius.value.y-radY) * std::sin((1-relativePos ) * 4 * std::numbers::pi);
-        }
-      } else {
-          out[0] = point[0] + radX * std::cos(relativePos * 4 * std::numbers::pi);
-          out[1] = point[1] + radY * std::sin(relativePos * 4 * std::numbers::pi);
-      }
+    if (inputs.loop && reverse) {
+      out[0] = end[0] - (end[0] - start[0]) * relativePos;
+      out[1] = end[1] - (end[1] - start[1]) * relativePos;
+    } else {
+      out[0] = start[0] + (end[0] - start[0]) * relativePos;
+      out[1] = start[1] + (end[1] - start[1]) * relativePos;
     }
   }
 }
+
+void PathGenerator::CirclePath(const halp::tick_flicks& t, float relativePos, bool reverse) {
+
+  float angle = inputs.loop && reverse ? (TWO_PI - relativePos * TWO_PI) : (relativePos * TWO_PI);
+
+  for (size_t v = 0; v < outputs.OutTab.value.size(); v++) {
+    auto point = inputs.pos.value[v].get<std::vector<ossia::value>>()[0].get<ossia::vec2f>();
+    auto& out  = outputs.OutTab.value[v].get<ossia::vec2f>();
+
+    out[0] = point[0] + inputs.radius.value.x * std::cos(angle);
+    out[1] = point[1] + inputs.radius.value.y * std::sin(angle);
+  }
+}
+
+void PathGenerator::SpiralPath(const halp::tick_flicks& t, float relativePos, bool reverse) {
+
+  float angle = relativePos * FOUR_PI;
+  float radX = inputs.radius.value.x * relativePos;
+  float radY = inputs.radius.value.y * relativePos;
+
+  for (size_t v = 0; v < outputs.OutTab.value.size(); v++) {
+    auto point = inputs.pos.value[v].get<std::vector<ossia::value>>()[0].get<ossia::vec2f>();
+    auto& out  = outputs.OutTab.value[v].get<ossia::vec2f>();
+
+    if (inputs.loop && reverse) {
+      out[0] = point[0] + (inputs.radius.value.x - radX) * std::cos((1 - relativePos) * FOUR_PI);
+      out[1] = point[1] + (inputs.radius.value.y - radY) * std::sin((1 - relativePos) * FOUR_PI);
+    } else {
+      out[0] = point[0] + radX * std::cos(angle);
+      out[1] = point[1] + radY * std::sin(angle);
+    }
+  }
+}
+
 }

@@ -6,11 +6,9 @@
 #include <halp/layout.hpp>
 #include <halp/meta.hpp>
 
-namespace Example
-{
+namespace Example {
 
-class PathGenerator
-{
+class PathGenerator {
 public:
   halp_meta(name, "PathGenerator")
   halp_meta(c_name, "pathgenerator")
@@ -20,13 +18,12 @@ public:
   halp_meta(author, "Ahmed El Moudden")
   halp_meta(uuid, "95a53434-276a-42a3-bb6b-ee92462b9640")
 
-  struct ins
-  {
+  struct ins {
     halp::knob_f32<"Speed", halp::range{.min = 0., .max = 10., .init = 1.}> speed;
-    halp::toggle<"Loop"> loop;
+    halp::toggle<"Ping Pong"> loop;
     halp::enum_t<Control::Widgets::Path, "Path"> Path;
-    struct
-    {
+
+    struct {
       halp_meta(name, "Position")
       struct range {
         float min = 0;
@@ -37,28 +34,29 @@ public:
       std::vector<ossia::value> value;
     } pos;
 
-        halp::xy_spinboxes_f32<"Radius", halp::range{.min = 0., .max = 1, .init = 0.2}> radius;
-
-    //halp::val_port<"Cursors", std::vector<std::vector<Object>>> tab;
+    halp::xy_spinboxes_f32<"Radius", halp::range{.min = 0., .max = 1, .init = 0.2}> radius;
   } inputs;
 
-  struct
-  {
-    halp::val_port<"Output",std::vector<ossia::value>> OutTab;
+  struct {
+    halp::val_port<"Output", std::vector<ossia::value>> OutTab;
   } outputs;
 
   using setup = halp::setup;
-  void prepare(halp::setup info)
-  {
-    for (size_t i = 0; i < inputs.pos.value.size();i++){
-      outputs.OutTab.value.push_back(inputs.pos.value[i].get<std::vector<ossia::value>>()[0].get<ossia::vec2f>());
+
+  void prepare(halp::setup info) {
+    for (size_t i = 0; i < inputs.pos.value.size(); i++) {
+      outputs.OutTab.value.push_back(
+          inputs.pos.value[i].get<std::vector<ossia::value>>()[0].get<ossia::vec2f>()
+          );
     }
   }
 
   using tick = halp::tick_flicks;
 
   void operator()(const halp::tick_flicks& t);
-
+  void LinearPath(const halp::tick_flicks& t, float relativePos, bool reverse);
+  void CirclePath(const halp::tick_flicks& t, float relativePos, bool reverse);
+  void SpiralPath(const halp::tick_flicks& t, float relativePos, bool reverse);
 };
 
 }
