@@ -23,7 +23,6 @@ avnd_score_plugin_add(
     GBAP/GBAPModel.hpp
     GBAP/GBAPModel.cpp
     GBAP/GridWidget.hpp
-    GBAP/GridWidget.cpp
     GBAP/GBAPUi.hpp
   TARGET GBAP
   MAIN_CLASS GBAP

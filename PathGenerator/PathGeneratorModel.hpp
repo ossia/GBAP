@@ -54,9 +54,9 @@ public:
   using tick = halp::tick_flicks;
 
   void operator()(const halp::tick_flicks& t);
-  void LinearPath(const halp::tick_flicks& t, float relativePos, bool reverse);
-  void CirclePath(const halp::tick_flicks& t, float relativePos, bool reverse);
-  void SpiralPath(const halp::tick_flicks& t, float relativePos, bool reverse);
+  void linear_path(const halp::tick_flicks& t, const float relativePos, const bool reverse);
+  void circle_path(const halp::tick_flicks& t, const float relativePos, const bool reverse);
+  void spiral_path(const halp::tick_flicks& t, const float relativePos, const bool reverse);
 };
 
 }

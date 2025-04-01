@@ -13,18 +13,18 @@ void PathGenerator::operator()(const halp::tick_flicks& t) {
   bool reverse = (int(t.relative_position * inputs.speed) % 2) != 0;
 
   switch (inputs.Path) {
-    case 0: LinearPath(t, relativePos, reverse); break;
-    case 1: CirclePath(t, relativePos, reverse); break;
-    case 2: SpiralPath(t, relativePos, reverse); break;
+    case 0: linear_path(t, relativePos, reverse); break;
+    case 1: circle_path(t, relativePos, reverse); break;
+    case 2: spiral_path(t, relativePos, reverse); break;
     default: break;
   }
 }
 
-void PathGenerator::LinearPath(const halp::tick_flicks& t, float relativePos, bool reverse) {
+void PathGenerator::linear_path(const halp::tick_flicks& t, float relativePos, bool reverse) {
 
   for (size_t v = 0; v < outputs.OutTab.value.size(); v++) {
-    auto start = inputs.pos.value[v].get<std::vector<ossia::value>>()[0].get<ossia::vec2f>();
-    auto end   = inputs.pos.value[v].get<std::vector<ossia::value>>()[1].get<ossia::vec2f>();
+    const auto start = inputs.pos.value[v].get<std::vector<ossia::value>>()[0].get<ossia::vec2f>();
+    const auto end   = inputs.pos.value[v].get<std::vector<ossia::value>>()[1].get<ossia::vec2f>();
     auto& out  = outputs.OutTab.value[v].get<ossia::vec2f>();
 
     if (inputs.loop && reverse) {
@@ -37,12 +37,12 @@ void PathGenerator::LinearPath(const halp::tick_flicks& t, float relativePos, bo
   }
 }
 
-void PathGenerator::CirclePath(const halp::tick_flicks& t, float relativePos, bool reverse) {
+void PathGenerator::circle_path(const halp::tick_flicks& t, const float relativePos, const bool reverse) {
 
-  float angle = inputs.loop && reverse ? (TWO_PI - relativePos * TWO_PI) : (relativePos * TWO_PI);
+  const float angle = TWO_PI * (inputs.loop && reverse ? 1. - relativePos : relativePos);
 
   for (size_t v = 0; v < outputs.OutTab.value.size(); v++) {
-    auto point = inputs.pos.value[v].get<std::vector<ossia::value>>()[0].get<ossia::vec2f>();
+    const auto point = inputs.pos.value[v].get<std::vector<ossia::value>>()[0].get<ossia::vec2f>();
     auto& out  = outputs.OutTab.value[v].get<ossia::vec2f>();
 
     out[0] = point[0] + inputs.radius.value.x * std::cos(angle);
@@ -50,11 +50,11 @@ void PathGenerator::CirclePath(const halp::tick_flicks& t, float relativePos, bo
   }
 }
 
-void PathGenerator::SpiralPath(const halp::tick_flicks& t, float relativePos, bool reverse) {
+void PathGenerator::spiral_path(const halp::tick_flicks& t,const float relativePos,const bool reverse) {
 
-  float angle = relativePos * FOUR_PI;
-  float radX = inputs.radius.value.x * relativePos;
-  float radY = inputs.radius.value.y * relativePos;
+  const float angle = relativePos * FOUR_PI;
+  const float radX = inputs.radius.value.x * relativePos;
+  const float radY = inputs.radius.value.y * relativePos;
 
   for (size_t v = 0; v < outputs.OutTab.value.size(); v++) {
     auto point = inputs.pos.value[v].get<std::vector<ossia::value>>()[0].get<ossia::vec2f>();
