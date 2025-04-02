@@ -3,21 +3,29 @@
 #include <QDebug>
 
 #include <algorithm>
+#include <iostream>
 
 namespace Example
 {
 void GBAP::operator()(halp::tick t)
 {
+  bool multi = !inputs.MultiTab.value.empty();
+
+  const int nSinks = (inputs.nSinksX.value * inputs.nSinksY.value);
   float minX{0}, maxX{1}, minY{0}, maxY{1};
   int ModmX{0}, ModMX{0}, ModmY{0}, ModMY{0};
 
-  for (int i = 0; i<inputs.nSources; i++){
+  volumes.clear();
+  //volumes.resize(multi ? inputs.MultiTab.value.size() : 1);
 
-    float posX = inputs.pos.value.x;
-    float posY = inputs.pos.value.y;
+  for (int i = 0; i< (multi ? inputs.MultiTab.value.size() : 1); i++){
 
-    //if(static int c=0; c++ % 10 == 0)
-       //qDebug() << posX << " / " << posY;
+    volumes.push_back(ossia::value());
+    volumes[i]=std::vector<ossia::value>();
+    auto& vol =  volumes[i].get<std::vector<ossia::value>>();
+
+    float posX = multi ? inputs.MultiTab.value[i][0] : inputs.pos.value.x;
+    float posY = multi ? inputs.MultiTab.value[i][1]  : inputs.pos.value.y;
 
     const auto cursorSize = inputs.cursorSize.value;
     const auto sinkSize = inputs.sinkSize.value;
@@ -58,24 +66,21 @@ void GBAP::operator()(halp::tick t)
         ModMY++;
     }
 
-    int nSinks = (inputs.nSinksX.value * inputs.nSinksY.value);
     if(nSinks <= 1)
     {
-      volumes.clear();
+      vol.clear();
       nSinksprev = 0;
-      return;
     }
 
-    if(nSinksprev != nSinks)
+    if(vol.size() != nSinks)
     {
-      volumes.clear();
-      volumes.resize(nSinks); // They will be initialized to zero
-      nSinksprev = nSinks;
+      vol.clear();
+      vol.resize(nSinks); // They will be initialized to zero
     }
 
-    for(int i = 0; i < nSinks; i++) //Reset sinks values
-    {
-      volumes[i] = 0;
+    SCORE_ASSERT(vol.size() == nSinks);
+    for (int v = 0; v < vol.size(); v++) {
+      vol[v] = float(0);
     }
 
     for(int y = ModmY; y <= ModMY; y++)
@@ -95,7 +100,7 @@ void GBAP::operator()(halp::tick t)
             Ys = std::max(minY, (sinkSize.y + intervY) * y / 2);
             Ye = std::min(((sinkSize.y + intervY) * y + 2 * sinkSize.y) / 2, maxY);
             area = (Xe - Xs) / sinkSize.x * (Ye - Ys) / sinkSize.y;
-            volumes[x / 2 + y / 2 * inputs.nSinksX.value] += area;
+            vol[x / 2 + y / 2 * inputs.nSinksX.value].get<float>() += area;
             break;
           case 1:
             if(inputs.nSinksX.value > 1)
@@ -107,10 +112,8 @@ void GBAP::operator()(halp::tick t)
               Ye = std::min(((sinkSize.y + intervY) * y + 2 * sinkSize.y) / 2, maxY);
               area = (Xe - Xs) / intervX * (Ye - Ys) / sinkSize.y;
               center = ((Xe + Xs) / 2 - Xm) / intervX;
-              volumes[std::floor((float)x / 2) + y / 2 * inputs.nSinksX.value]
-                  += (1 - center) * area;
-              volumes[std::ceil((float)x / 2) + y / 2 * inputs.nSinksX.value]
-                  += center * area;
+              vol[std::floor((float)x / 2) + y / 2 * inputs.nSinksX.value].get<float>() += (1 - center) * area;
+              vol[std::ceil((float)x / 2) + y / 2 * inputs.nSinksX.value].get<float>() += center * area;
             }
             break;
           case 2:
@@ -123,10 +126,8 @@ void GBAP::operator()(halp::tick t)
               Ye = std::min((sinkSize.y + intervY) * std::floor((y + 1) / 2.f), maxY);
               area = (Xe - Xs) / sinkSize.x * (Ye - Ys) / intervY;
               center = ((Ye + Ys) / 2 - Ym) / intervY;
-              volumes[x / 2 + std::floor((float)y / 2) * inputs.nSinksX.value]
-                  += (1 - center) * area;
-              volumes[x / 2 + std::ceil((float)y / 2) * inputs.nSinksX.value]
-                  += center * area;
+              vol[x / 2 + std::floor((float)y / 2) * inputs.nSinksX.value].get<float>() += (1 - center) * area;
+              vol[x / 2 + std::ceil((float)y / 2) * inputs.nSinksX.value].get<float>() += center * area;
             }
             break;
           case 3:
@@ -141,74 +142,74 @@ void GBAP::operator()(halp::tick t)
               area = (Xe - Xs) / intervX * (Ye - Ys) / intervY;
               float centerX = ((Xe + Xs) / 2 - Xm) / intervX;
               float centerY = ((Ye + Ys) / 2 - Ym) / intervY;
-              volumes
-                  [std::floor((float)x / 2)
-                   + std::floor((float)y / 2) * inputs.nSinksX.value]
-                  += (1.f - centerX) * (1.f - centerY) * area;
-              volumes
-                  [std::ceil((float)x / 2)
-                   + std::floor((float)y / 2) * inputs.nSinksX.value]
-                  += centerX * (1.f - centerY) * area;
-              volumes
-                  [std::floor((float)x / 2)
-                   + std::ceil((float)y / 2) * inputs.nSinksX.value]
-                  += (1.f - centerX) * centerY * area;
-              volumes
-                  [std::ceil((float)x / 2)
-                   + std::ceil((float)y / 2) * inputs.nSinksX.value]
-                  += centerX * centerY * area;
+              vol[std::floor((float)x / 2) + std::floor((float)y / 2) * inputs.nSinksX.value].get<float>() += (1.f - centerX) * (1.f - centerY) * area;
+              vol[std::ceil((float)x / 2) + std::floor((float)y / 2) * inputs.nSinksX.value].get<float>() += centerX * (1.f - centerY) * area;
+              vol[std::floor((float)x / 2) + std::ceil((float)y / 2) * inputs.nSinksX.value].get<float>() += (1.f - centerX) * centerY * area;
+              vol[std::ceil((float)x / 2) + std::ceil((float)y / 2) * inputs.nSinksX.value].get<float>() += centerX * centerY * area;
             }
             break;
         }
       }
     }
-    rollOffArray(volumes);
+
+    rollOffArray(vol);
     if (inputs.normalize){
-      normalizeArray(volumes);
+      normalizeArray(vol);
     }
 
     const float gain = inputs.gain.value
                        * ((inputs.weights.value.size() > 0)
                               ? inputs.weights.value[inputs.systemNumber.value - 1]
                               : 1.f);
-    mult(volumes, gain);
+    mult(vol, gain);
     //vols = vols.concat(volumes);
-    //outputs.weights.value[0] = posX;
-    //outputs.weights.value[1] = posY;
-    outputs.weights.value = volumes;
   }
+
+  nSinksprev = nSinks;
+  outputs.weights.value = volumes;
+
 }
 
-void GBAP::rollOffArray(std::vector<float>& arr)
+void GBAP::rollOffArray(std::vector<ossia::value>& arr)
 {
   if(rollOffV <= 0.)
     return;
 
-  float sum = std::accumulate(arr.begin(), arr.end(), 0.f);
+  float sum{0};
+
+  for(ossia::value& f :arr){
+    sum += f.get<float>();
+  }
 
   if(sum != 0)
   {
-    for(float& f : arr)
-      f = std::pow((f / sum), rollOffV / 2.);
+    for(ossia::value& f : arr)
+      f.get<float>()  = std::pow((f.get<float>() / sum), rollOffV / 2.);
   }
 }
 
-void GBAP::mult(std::vector<float>& arr, float scal)
+void GBAP::mult(std::vector<ossia::value>& arr, float scal)
 {
-  for(float& f : arr)
-    f *= scal;
+  for(ossia::value& f : arr)
+    f.get<float>() *= scal;
 }
 
-void GBAP::normalizeArray(std::vector<float>& arr){
+void GBAP::normalizeArray(std::vector<ossia::value>& arr){
 
   if(arr.empty())
     return;
 
-  float max = *std::max_element(arr.begin(), arr.end());
+  float max {0};
+
+  for (ossia::value& f : arr){
+    if (f.get<float>() > max){
+      max=f.get<float>();
+    }
+  }
 
   if (max != 0){
-    for(float& f : arr){
-      f /= max;
+    for(ossia::value& f : arr){
+      f.get<float>() /= max;
     }
   }
 

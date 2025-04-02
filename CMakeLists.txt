@@ -23,7 +23,6 @@ avnd_score_plugin_add(
     GBAP/GBAPModel.hpp
     GBAP/GBAPModel.cpp
     GBAP/GridWidget.hpp
-    GBAP/GridWidget.cpp
     GBAP/GBAPUi.hpp
   TARGET GBAP
   MAIN_CLASS GBAP
@@ -41,6 +40,29 @@ avnd_score_plugin_add(
   MAIN_CLASS matrix
   NAMESPACE Example
 )
+
+avnd_score_plugin_add(
+  BASE_TARGET score_addon_gbap
+  SOURCES
+    MultiCursor/MultiCursor.hpp
+    MultiCursor/MultiCursorModel.hpp
+    MultiCursor/MultiCursorModel.cpp
+  TARGET multicursormanager
+  MAIN_CLASS MultiCursorManager
+  NAMESPACE Example
+)
+
+avnd_score_plugin_add(
+  BASE_TARGET score_addon_gbap
+  SOURCES
+    PathGenerator/PathGenerator.hpp
+    PathGenerator/PathGeneratorModel.hpp
+    PathGenerator/PathGeneratorModel.cpp
+  TARGET pathgenerator
+  MAIN_CLASS PathGenerator
+  NAMESPACE Example
+)
+
 
 avnd_score_plugin_finalize(
   BASE_TARGET score_addon_gbap
