@@ -3,7 +3,6 @@
 #include <QDebug>
 
 #include <algorithm>
-#include <iostream>
 
 namespace Example
 {
@@ -16,7 +15,6 @@ void GBAP::operator()(halp::tick t)
   int ModmX{0}, ModMX{0}, ModmY{0}, ModMY{0};
 
   volumes.clear();
-  //volumes.resize(multi ? inputs.MultiTab.value.size() : 1);
 
   for (int i = 0; i< (multi ? inputs.MultiTab.value.size() : 1); i++){
 
@@ -28,13 +26,15 @@ void GBAP::operator()(halp::tick t)
     float posY = multi ? inputs.MultiTab.value[i][1]  : inputs.pos.value.y;
 
     const auto cursorSize = inputs.cursorSize.value;
-    const auto sinkSize = inputs.sinkSize.value;
+    auto sinkSize = inputs.sinkSize.value;
+    sinkSize.x = std::max(0.01f, sinkSize.x);
+    sinkSize.y = std::max(0.01f, sinkSize.y);
 
-    if(inputs.nSinksX.value > 1)
+    if(inputs.nSinksX.value > 1 && (sinkSize.x + intervX) > 0.f)
     {
       const auto den = (sinkSize.x + intervX);
-      if(den <= 0.f)
-        return;
+      // if(den <= 0.f)
+      //   return;
 
       minX = std::clamp(posX - cursorSize.x / 2, 0.f, 0.999999f);
       float ModminX = (float)minX / den;
@@ -48,11 +48,11 @@ void GBAP::operator()(halp::tick t)
         ModMX++;
     }
 
-    if(inputs.nSinksY.value > 1)
+    if(inputs.nSinksY.value > 1 && (sinkSize.y + intervY) > 0.f)
     {
       const auto den = (sinkSize.y + intervY);
-      if(den <= 0.f)
-        return;
+      // if(den <= 0.f)
+      //   return;
 
       minY = std::clamp(posY - cursorSize.y / 2, 0.f, 0.999999f);
       float ModminY = (float)minY / den;
@@ -101,9 +101,10 @@ void GBAP::operator()(halp::tick t)
             Ye = std::min(((sinkSize.y + intervY) * y + 2 * sinkSize.y) / 2, maxY);
             area = (Xe - Xs) / sinkSize.x * (Ye - Ys) / sinkSize.y;
             vol[x / 2 + y / 2 * inputs.nSinksX.value].get<float>() += area;
+
             break;
           case 1:
-            if(inputs.nSinksX.value > 1)
+            if(inputs.nSinksX.value > 1 && intervX > 0.f)
             {
               Xm = ((sinkSize.x + intervX) * (x - 1) + 2 * sinkSize.x) / 2;
               Xs = std::max(minX, ((sinkSize.x + intervX) * (x - 1) + 2 * sinkSize.x) / 2);
@@ -114,10 +115,11 @@ void GBAP::operator()(halp::tick t)
               center = ((Xe + Xs) / 2 - Xm) / intervX;
               vol[std::floor((float)x / 2) + y / 2 * inputs.nSinksX.value].get<float>() += (1 - center) * area;
               vol[std::ceil((float)x / 2) + y / 2 * inputs.nSinksX.value].get<float>() += center * area;
+
             }
             break;
           case 2:
-            if(inputs.nSinksY.value > 1)
+            if(inputs.nSinksY.value > 1 && intervY > 0.f)
             {
               Ym = ((sinkSize.y + intervY) * (y - 1) + 2 * sinkSize.y) / 2;
               Xs = std::max(minX, (sinkSize.x + intervX) * x / 2);
@@ -128,10 +130,11 @@ void GBAP::operator()(halp::tick t)
               center = ((Ye + Ys) / 2 - Ym) / intervY;
               vol[x / 2 + std::floor((float)y / 2) * inputs.nSinksX.value].get<float>() += (1 - center) * area;
               vol[x / 2 + std::ceil((float)y / 2) * inputs.nSinksX.value].get<float>() += center * area;
+
             }
             break;
           case 3:
-            if(inputs.nSinksY.value > 1 && inputs.nSinksX.value > 1)
+            if(inputs.nSinksY.value > 1 && inputs.nSinksX.value > 1 && intervY > 0.f && intervX > 0.f)
             {
               Xm = ((sinkSize.x + intervX) * (x - 1) + 2 * sinkSize.x) / 2;
               Ym = ((sinkSize.y + intervY) * (y - 1) + 2 * sinkSize.y) / 2;
@@ -146,6 +149,7 @@ void GBAP::operator()(halp::tick t)
               vol[std::ceil((float)x / 2) + std::floor((float)y / 2) * inputs.nSinksX.value].get<float>() += centerX * (1.f - centerY) * area;
               vol[std::floor((float)x / 2) + std::ceil((float)y / 2) * inputs.nSinksX.value].get<float>() += (1.f - centerX) * centerY * area;
               vol[std::ceil((float)x / 2) + std::ceil((float)y / 2) * inputs.nSinksX.value].get<float>() += centerX * centerY * area;
+
             }
             break;
         }

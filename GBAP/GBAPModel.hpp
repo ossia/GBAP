@@ -97,6 +97,7 @@ public:
   int nSinksprev{0};
   float rollOffV{1.};
 
+  float sinkX{}, sinkY{};
   void rollOffArray(std::vector<ossia::value>& arr);
   void mult(std::vector<ossia::value>& arr, float scal);
   void normalizeArray(std::vector<ossia::value>& arr);
