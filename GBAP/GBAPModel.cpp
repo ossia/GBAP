@@ -30,11 +30,11 @@ void GBAP::operator()(halp::tick t)
     sinkSize.x = std::max(0.01f, sinkSize.x);
     sinkSize.y = std::max(0.01f, sinkSize.y);
 
-    if(inputs.nSinksX.value > 1 && (sinkSize.x + intervX) > 0.f)
+    if(inputs.nSinksX.value > 1)
     {
       const auto den = (sinkSize.x + intervX);
-      // if(den <= 0.f)
-      //   return;
+      if(den <= 0.f)
+       return;
 
       minX = std::clamp(posX - cursorSize.x / 2, 0.f, 0.999999f);
       float ModminX = (float)minX / den;
@@ -48,11 +48,11 @@ void GBAP::operator()(halp::tick t)
         ModMX++;
     }
 
-    if(inputs.nSinksY.value > 1 && (sinkSize.y + intervY) > 0.f)
+    if(inputs.nSinksY.value > 1)
     {
       const auto den = (sinkSize.y + intervY);
-      // if(den <= 0.f)
-      //   return;
+      if(den <= 0.f)
+      return;
 
       minY = std::clamp(posY - cursorSize.y / 2, 0.f, 0.999999f);
       float ModminY = (float)minY / den;
@@ -83,11 +83,11 @@ void GBAP::operator()(halp::tick t)
       vol[v] = float(0);
     }
 
-    for(int y = ModmY; y <= ModMY; y++)
+    for(float y = ModmY; y <= ModMY; y++)
     {
-      for(int x = ModmX; x <= ModMX; x++)
+      for(float x = ModmX; x <= ModMX; x++)
       {
-        int modType = x % 2 + 2 * (y % 2);
+        int modType = int(x) % 2 + 2 * (int(y) % 2);
         float area = 0.f;
         float center = 0.5f;
         float Xs, Xe, Ys, Ye, Xm, Ym;
@@ -218,4 +218,16 @@ void GBAP::normalizeArray(std::vector<ossia::value>& arr){
   }
 
 }
+
+void GBAP::updateInterv(){
+
+  intervX = (inputs.nSinksX.value > 1)
+                      ? std::max(0.f,(1 - inputs.sinkSize.value.x) / (inputs.nSinksX.value - 1) - inputs.sinkSize.value.x)
+                    : 0;
+
+  intervY = (inputs.nSinksY.value > 1)
+                     ? std::max(0.f,(1 - inputs.sinkSize.value.y) / (inputs.nSinksY.value - 1) - inputs.sinkSize.value.y)
+                    : 0;
+}
+
 }
