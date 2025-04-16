@@ -41,16 +41,6 @@ public:
     halp::val_port<"Output", std::vector<ossia::value>> OutTab;
   } outputs;
 
-  using setup = halp::setup;
-
-  void prepare(halp::setup info) {
-    for (size_t i = 0; i < inputs.pos.value.size(); i++) {
-      outputs.OutTab.value.push_back(
-          inputs.pos.value[i].get<std::vector<ossia::value>>()[0].get<ossia::vec2f>()
-          );
-    }
-  }
-
   using tick = halp::tick_flicks;
 
   void operator()(const halp::tick_flicks& t);
