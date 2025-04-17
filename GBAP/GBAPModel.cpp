@@ -1,5 +1,7 @@
 #include "GBAP.hpp"
 
+#include <score/tools/Debug.hpp>
+
 #include <QDebug>
 
 #include <algorithm>
