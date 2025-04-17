@@ -35,9 +35,8 @@ public:
     {
       void update(GBAP& self)
       {
-        self.intervX = (value > 1) ? (1 - self.inputs.sinkSize.value.x) / (value - 1)
-                                         - self.inputs.sinkSize.value.x
-                                   : 0;
+        self.updateInterv();
+
         self.outputs.weights.value.resize(value * self.inputs.nSinksY.value);
       }
     } nSinksX;
@@ -46,9 +45,8 @@ public:
     {
       void update(GBAP& self)
       {
-        self.intervY = (value > 1) ? (1 - self.inputs.sinkSize.value.y) / (value - 1)
-                                         - self.inputs.sinkSize.value.y
-                                   : 0;
+        self.updateInterv();
+
         self.outputs.weights.value.resize(value * self.inputs.nSinksX.value);
       }
     } nSinksY;
@@ -62,12 +60,7 @@ public:
     {
       void update(GBAP& self)
       {
-        self.intervX = (self.inputs.nSinksX.value > 1)
-                           ? std::max(0.f,(1 - value.x) / (self.inputs.nSinksX.value - 1) - value.x)
-                           : 0;
-        self.intervY = (self.inputs.nSinksY.value > 1)
-                           ? std::max(0.f,(1 - value.y) / (self.inputs.nSinksY.value - 1) - value.y)
-                           : 0;
+        self.updateInterv();
       }
     } sinkSize;
 
@@ -101,6 +94,7 @@ public:
   void rollOffArray(std::vector<ossia::value>& arr);
   void mult(std::vector<ossia::value>& arr, float scal);
   void normalizeArray(std::vector<ossia::value>& arr);
+  void updateInterv();
 };
 
 }
