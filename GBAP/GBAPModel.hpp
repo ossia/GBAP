@@ -19,6 +19,13 @@ public:
   halp_meta(category, "Control/Spatialization")
   halp_meta(c_name, "GBAP")
   halp_meta(uuid, "81DB0C30-175B-422E-8C5F-87569D50548E")
+  halp_meta(
+      author,
+      "Pía Baltazar, Ahmed El Moudden, Sarah Al Mamoun, Jean-Michaël Celerier, Société "
+      "des Arts Technologiques");
+  halp_meta(
+      description, "Grid-based value ponderation, useful for sound spatialization.");
+  halp_meta(manual_url, "https://ossia.io/score-docs/processes/gbap.html")
 
   struct ins
   {
