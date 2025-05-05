@@ -6,7 +6,7 @@
 
 #include <vector>
 
-namespace Example
+namespace spat
 {
 
 class matrix

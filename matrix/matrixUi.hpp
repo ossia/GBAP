@@ -2,7 +2,7 @@
 #include <matrix/matrixModel.hpp>
 #include <halp/layout.hpp>
 /*
-namespace Example
+namespace spat
 {
 struct matrix::ui
 {

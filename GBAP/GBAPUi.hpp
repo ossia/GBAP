@@ -2,7 +2,7 @@
 #include <GBAP/GridWidget.hpp>
 #include <GBAP/GBAPModel.hpp>
 #include <halp/layout.hpp>
-namespace Example
+namespace spat
 {
 
 struct GBAP::ui

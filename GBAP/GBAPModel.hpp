@@ -9,7 +9,7 @@
 
 #include <vector>
 
-namespace Example
+namespace spat
 {
 
 class GBAP

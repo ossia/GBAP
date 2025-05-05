@@ -1,13 +1,18 @@
 #pragma once
 
-#include "Engine/Node/CommonWidgets.hpp"
 #include <halp/audio.hpp>
 #include <halp/controls.hpp>
 #include <halp/layout.hpp>
 #include <halp/meta.hpp>
 
-namespace Example {
+namespace spat {
 
+enum Path
+{
+  Linear,
+  Circle,
+  Spiral
+};
 class PathGenerator {
 public:
   halp_meta(name, "PathGenerator")
@@ -21,7 +26,7 @@ public:
   struct ins {
     halp::knob_f32<"Speed", halp::range{.min = 0., .max = 10., .init = 1.}> speed;
     halp::toggle<"Ping Pong"> loop;
-    halp::enum_t<Control::Widgets::Path, "Path"> Path;
+    halp::enum_t<Path, "Path"> path;
 
     struct {
       halp_meta(name, "Position")

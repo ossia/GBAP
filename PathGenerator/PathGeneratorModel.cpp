@@ -2,7 +2,7 @@
 #include <cmath>
 #include <numbers>
 
-namespace Example {
+namespace spat {
 
 // Constants for angle calculations
 constexpr float TWO_PI = 2.0f * std::numbers::pi;
@@ -21,7 +21,7 @@ void PathGenerator::operator()(const halp::tick_flicks& t) {
   }
 
   // Dispatch to path function
-  switch (inputs.Path) {
+  switch (inputs.path) {
     case 0: linear_path(t, relativePos, reverse); break;
     case 1: circle_path(t, relativePos, reverse); break;
     case 2: spiral_path(t, relativePos, reverse); break;

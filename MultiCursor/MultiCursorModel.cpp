@@ -1,6 +1,6 @@
 #include "MultiCursor.hpp"
 
-namespace Example
+namespace spat
 {
 void MultiCursorManager::operator()(halp::tick t)
 {

@@ -1,6 +1,6 @@
 #include "matrix.hpp"
 
-namespace Example
+namespace spat
 {
 
 void matrix::operator()(halp::tick t)

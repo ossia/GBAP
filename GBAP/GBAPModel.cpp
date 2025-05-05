@@ -6,7 +6,7 @@
 
 #include <algorithm>
 
-namespace Example
+namespace spat
 {
 void GBAP::operator()(halp::tick t)
 {

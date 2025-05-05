@@ -6,7 +6,7 @@
 #include <halp/meta.hpp>
 
 
-namespace Example
+namespace spat
 {
 
 class MultiCursorManager
