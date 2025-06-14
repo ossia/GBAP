@@ -1,5 +1,7 @@
 #pragma once
 
+#include <ossia/network/value/value.hpp>
+
 #include <halp/audio.hpp>
 #include <halp/controls.hpp>
 #include <halp/layout.hpp>

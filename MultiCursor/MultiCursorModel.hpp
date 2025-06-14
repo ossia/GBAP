@@ -1,10 +1,12 @@
 #pragma once
 
 #include <Engine/Node/CommonWidgets.hpp>
+
+#include <ossia/network/value/value.hpp>
+
 #include <halp/audio.hpp>
 #include <halp/controls.hpp>
 #include <halp/meta.hpp>
-
 
 namespace spat
 {
