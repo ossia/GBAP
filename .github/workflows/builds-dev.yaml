@@ -1,10 +1,23 @@
 name: CMake build (dev)
 
-on: push
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - main
+      - dev
+      - develop
+    tags:
+      - v*
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
-    name: ${{ matrix.config.name }}
+    name: "Dev ${{ matrix.config.name }}"
     runs-on: ${{ matrix.config.os }}
     strategy:
       fail-fast: false
@@ -13,116 +26,87 @@ jobs:
           - {
               name: "Windows",
               os: windows-latest,
-              path: "/c/ossia-sdk/llvm/bin",
-              common_flags: "-GNinja -DCMAKE_C_COMPILER=c:/ossia-sdk/llvm/bin/clang.exe -DCMAKE_CXX_COMPILER=c:/ossia-sdk/llvm/bin/clang++.exe -DCMAKE_UNITY_BUILD=1",
-              debug_flags: "-DCMAKE_BUILD_TYPE=Debug",
-              release_flags: "-DCMAKE_BUILD_TYPE=Release",
-              dependencies: "choco install -y ninja",
-              sdk: "/c/ossia-sdk",
+              dependencies: "curl -L -O https://github.com/ninja-build/ninja/releases/download/v1.13.1/ninja-win.zip && unzip ninja-win.zip",
+              additional_flags: "-GNinja"
             }
           - {
               name: "Ubuntu",
               os: ubuntu-latest,
-              path: "/opt/ossia-sdk/llvm/bin",
-              common_flags: "-DCMAKE_C_COMPILER=/opt/ossia-sdk/llvm/bin/clang -DCMAKE_CXX_COMPILER=/opt/ossia-sdk/llvm/bin/clang++ -DCMAKE_UNITY_BUILD=1",
-              debug_flags: "-DCMAKE_BUILD_TYPE=Debug",
-              release_flags: "-DCMAKE_BUILD_TYPE=Release",
-              dependencies: "sudo apt install libgl-dev libgl1-mesa-dev libegl1-mesa-dev libdrm-dev libxcomposite-dev libxkbcommon-dev libxkbcommon-x11-dev libwayland-dev libxcb-*-dev libX11-*-dev libz-dev libtinfo5 libxext-dev",
-              sdk: "/opt/ossia-sdk",
+              dependencies: "sudo apt install -yqq libgl-dev libgl1-mesa-dev libegl1-mesa-dev libdrm-dev libxcomposite-dev libxkbcommon-dev libxkbcommon-x11-dev libwayland-dev libxcb-*-dev libX11-*-dev libz-dev libtinfo6 libxext-dev",
+              additional_flags: ""
             }
           - {
               name: "macOS",
               os: macos-latest,
-              common_flags: "-DCMAKE_UNITY_BUILD=1",
-              debug_flags: "-DCMAKE_BUILD_TYPE=Debug",
-              release_flags: "-DCMAKE_BUILD_TYPE=Release",
-              sdk: "/opt/ossia-sdk-x86_64",
+              dependencies: "",
+              additional_flags: ""
             }
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Checkout addon
+        uses: actions/checkout@v4
         with:
           submodules: "recursive"
           path: addon
 
       - name: Checkout score
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: ossia/score
           submodules: "recursive"
           path: score
 
       - name: Install dependencies
+        if: matrix.config.dependencies != ''
         shell: bash
         run: |
           ${{ matrix.config.dependencies }}
 
-      - name: Download SDK
-        shell: bash
-        run: |
-          cd score
-          tools/fetch-sdk.sh
+      - name: Download OSSIA SDK
+        id: ossia-sdk
+        uses: ossia/actions/download-ossia-sdk@master
+        with:
+          score-path: score
 
       - name: Build debug
-        shell: bash
-        run: |
-          mkdir build-debug
-          cd build-debug
-
-          if [[ "${{ matrix.config.path }}" != "" ]]; then
-            export PATH=${{ matrix.config.path }}:$PATH
-          fi
-
-          cmake ../addon \
-            -DCMAKE_MODULE_PATH=../score/cmake \
-            -DSCORE_SOURCE_DIR=../score \
-            -DOSSIA_SDK=${{ matrix.config.sdk }} \
-            ${{ matrix.config.common_flags }} \
-            ${{ matrix.config.debug_flags }}
-
-          cmake --build .
+        uses: ossia/actions/build-addon@master
+        with:
+          addon-path: addon
+          build-type: Debug
+          score-path: score
+          ossia-sdk-path: ${{ steps.ossia-sdk.outputs.sdk-path }}
+          additional-flags: ${{ matrix.config.additional_flags }}
 
       - name: Build release
-        shell: bash
-        run: |
-          mkdir build-release
-          cd build-release
-
-          if [[ "${{ matrix.config.path }}" != "" ]]; then
-            export PATH=${{ matrix.config.path }}:$PATH
-          fi
-
-          cmake ../addon \
-            -DCMAKE_MODULE_PATH=../score/cmake \
-            -DSCORE_SOURCE_DIR=../score \
-            -DOSSIA_SDK=${{ matrix.config.sdk }} \
-            -DCMAKE_INSTALL_PREFIX=install \
-            ${{ matrix.config.common_flags }} \
-            ${{ matrix.config.release_flags }}
-
-          cmake --build .
-          cmake --build . --target install
+        uses: ossia/actions/build-addon@master
+        with:
+          addon-path: addon
+          build-type: Release
+          score-path: score
+          ossia-sdk-path: ${{ steps.ossia-sdk.outputs.sdk-path }}
+          additional-flags: ${{ matrix.config.additional_flags }}
 
       - name: Upload release
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: plugin-${{ matrix.config.os }}
           path: |
-            build-release/install/plugins
+            build-Release/install/plugins
 
-  upload:
-    name: Combine
+  package:
+    name: Package
     needs: build
-
     runs-on: ubuntu-latest
     steps:
-      - name: Download all workflow run artifacts
-        uses: actions/download-artifact@v3
+      - name: Checkout addon
+        uses: actions/checkout@v4
+        with:
+          submodules: "recursive"
 
-      - name: ls
-        shell: bash
-        run: |
-          pwd
-          ls
-          find .
+      - name: Package addon
+        uses: ossia/actions/package-addon@master
 
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin
+          path: deploy
