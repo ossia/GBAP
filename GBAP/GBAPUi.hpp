@@ -25,6 +25,7 @@ struct GBAP::ui
     halp::item<&ins::systemNumber> snum;
     halp::control<&ins::sinkSize> sinkSize;
     halp::control<&ins::cursorSize> cursorSize; //change from item to control
+    halp::control<&ins::pos> pos;
   } controls;
 
   halp::custom_control<mbap::GridWidget, &ins::pos> area;

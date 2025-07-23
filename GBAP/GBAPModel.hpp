@@ -74,7 +74,7 @@ public:
     } sinkSize;
 
     halp::xy_spinboxes_f32<"Cursor Size", halp::range{.min = 0., .max = 1., .init = 0.04}> cursorSize;
-    halp::xy_pad_f32<"Position", halp::range{.min = 0., .max = 1., .init = 0.5}> pos;
+    halp::xy_spinboxes_f32<"Position", halp::range{.min = 0., .max = 1., .init = 0.5}> pos;
 
   } inputs;
 
