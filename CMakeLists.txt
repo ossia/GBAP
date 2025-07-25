@@ -63,6 +63,17 @@ avnd_score_plugin_add(
   NAMESPACE spat
 )
 
+avnd_score_plugin_add(
+  BASE_TARGET score_addon_gbap
+  SOURCES
+    Nodes/Nodes.hpp
+    Nodes/NodesModel.hpp
+    Nodes/NodesUi.hpp
+    Nodes/NodesWidget.hpp
+  TARGET Nodes
+  MAIN_CLASS Nodes
+  NAMESPACE  spat
+)
 
 avnd_score_plugin_finalize(
   BASE_TARGET score_addon_gbap
