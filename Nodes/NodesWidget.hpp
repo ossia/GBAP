@@ -287,45 +287,36 @@ struct NodesWidget
     // Visualization of Voronoi cells with smooth transitions using pixmap
     const int w = width();
     const int h = height();
+    const int N = nodes.size();
     const float blurRadius = globalRadius;
     static constexpr int step = 8;
 
     // Create RGBA pixmap
     pixmap.clear();
     pixmap.resize(w * h * 4 / step);
-    distances.resize(nodes.size());
-    weights.resize(nodes.size());
+    distances.resize(N);
+    weights.resize(N);
 
     // Render voronoi cells to pixmap
-    int ox = 0, oy = 0;
     ;
     for(int py = 0; py < h; py += step)
     {
-      oy = py / step;
       for(int px = 0; px < w; px += step)
       {
-        ox = px / step;
-        float x = px / (float)w;
-        float y = py / (float)h;
+        const float x = px / (float)w;
+        const float y = py / (float)h;
 
-        // Calculate distances to all nodes
-#pragma omp simd
-        for (int i = 0; i < nodes.size(); ++i)
-        {
-          distances[i] = std::hypot(x - nodes[i].x, y - nodes[i].y);
-        }
-
-        // Find the closest node distance
         float minDist = std::numeric_limits<float>::max();
-#pragma omp simd
-        for (float dist : distances)
+
+        for(int i = 0; i < N; ++i)
         {
+          const float dist = std::hypot(x - nodes[i].x, y - nodes[i].y);
+          distances[i] = dist;
           minDist = std::min(minDist, dist);
         }
-        
-        // Calculate weights using same algorithm as processing
+
         float totalWeight = 0.0f;
-        for (int i = 0; i < nodes.size(); ++i)
+        for(int i = 0; i < N; ++i)
         {
           float weight = 0.0f;
           float distFromClosest = distances[i] - minDist;
@@ -344,17 +335,13 @@ struct NodesWidget
         // Normalize weights
         if(totalWeight > 0.0f)
         {
-#pragma omp simd
-          for (auto& w : weights)
-          {
+          for(auto& w : weights)
             w /= totalWeight;
-          }
         }
-        
+
         // Blend colors based on weights
         float r = 0, g = 0, b = 0;
-#pragma omp simd
-        for (int i = 0; i < nodes.size(); ++i)
+        for(int i = 0; i < N; ++i)
         {
           if (weights[i] > 0.0f)
           {
@@ -365,7 +352,7 @@ struct NodesWidget
         }
         
         // Write to pixmap (RGBA format)
-        int idx = (oy * w / step + ox) * 4;
+        int idx = (py * w / step + px) * 4 / step;
         pixmap[idx] = (unsigned char)r;
         pixmap[idx + 1] = (unsigned char)g;
         pixmap[idx + 2] = (unsigned char)b;
