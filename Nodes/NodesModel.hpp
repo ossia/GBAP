@@ -8,6 +8,7 @@
 #include <halp/sample_accurate_controls.hpp>
 
 #include <cmath>
+#include <limits>
 #include <vector>
 
 namespace spat
@@ -39,9 +40,10 @@ public:
       };
       void update(Nodes& self) { self.updateNodesFromInput(); }
     } nodes;
-    
-    halp::knob_f32<"Global Radius", halp::range{.min = 0.01, .max = 0.5, .init = 0.1}> globalRadius;
+
+    halp::knob_f32<"Smooth", halp::range{.min = 0.01, .max = 0.5, .init = 0.1}> smooth;
     halp::toggle<"Normalize"> normalize;
+    halp::toggle<"Voronoi Mode"> voronoiMode;
   } inputs;
 
   struct outs
@@ -86,6 +88,8 @@ public:
     halp_flag(relocatable);
     std::vector<halp::xyz_type<float>> nodes;
     halp::xy_type<float> inputPoint;
+    bool voronoiMode;
+    float globalRadius;
   };
 
   // Process messages from UI
@@ -112,61 +116,124 @@ public:
 
   void updateWeights()
   {
-    outputs.weights.value.clear();
+    auto& weights = outputs.weights.value;
+    weights.clear();
 
     if (m_nodes.empty())
       return;
 
-    float totalWeight = 0.0f;
-    std::vector<float> weights;
     weights.reserve(m_nodes.size());
 
     const float inputX = inputs.inputPoint.value.x;
     const float inputY = inputs.inputPoint.value.y;
 
-    // Calculate weights for each node
-    for (const auto& node : m_nodes)
+    if (inputs.voronoiMode)
     {
-      float dx = inputX - node.x;
-      float dy = inputY - node.y;
-      float dist = std::sqrt(dx * dx + dy * dy);
-
-      float weight = 0.0f;
-      if (dist < node.radius)
+      // Voronoi mode with smooth transitions using distance-based weighting
+      std::vector<float> distances;
+      distances.reserve(m_nodes.size());
+      
+      // Calculate distances to all nodes
+      for (const auto& node : m_nodes)
       {
-        // Linear falloff within radius
-        weight = 1.0f - (dist / node.radius);
-        weight = std::max(0.0f, std::min(1.0f, weight));
+        float dx = inputX - node.x;
+        float dy = inputY - node.y;
+        float dist = std::sqrt(dx * dx + dy * dy);
+        distances.push_back(dist);
+      }
+      
+      // Find the closest node distance
+      float minDist = std::numeric_limits<float>::max();
+      for (float dist : distances)
+      {
+        minDist = std::min(minDist, dist);
       }
 
-      weights.push_back(weight);
-      totalWeight += weight;
-    }
+      const float blurRadius = inputs.smooth;
 
-    // Normalize weights if requested and total > 1
-    if (inputs.normalize && totalWeight > 1.0f && totalWeight > 0.0f)
-    {
-      for (auto& w : weights)
+      // Calculate weights based on distance from closest node
+      // This approach considers all nodes within the blur radius
+      for (int i = 0; i < m_nodes.size(); ++i)
       {
-        w /= totalWeight;
+        float weight = 0.0f;
+        float distFromClosest = distances[i] - minDist;
+        
+        if (distFromClosest < 2.0f * blurRadius)
+        {
+          // Node is within transition zone
+          // Use smooth exponential falloff for better blending
+          float t = distFromClosest / (2.0f * blurRadius);
+          weight = std::exp(-3.0f * t * t); // Gaussian-like falloff
+        }
+        
+        weights.push_back(weight);
+      }
+      
+      // Normalize weights to ensure they sum to 1
+      float totalWeight = 0.0f;
+      for (auto w : weights)
+      {
+        totalWeight += w;
+      }
+      
+      if (totalWeight > 0.0f)
+      {
+        for (auto& w : weights)
+        {
+          w /= totalWeight;
+        }
+      }
+    }
+    else
+    {
+      // Distance-based mode with radius falloff
+      float totalWeight = 0.0f;
+      
+      // Calculate weights for each node
+      for (const auto& node : m_nodes)
+      {
+        float dx = inputX - node.x;
+        float dy = inputY - node.y;
+        float dist = std::sqrt(dx * dx + dy * dy);
+
+        float weight = 0.0f;
+        if (dist < node.radius)
+        {
+          // Linear falloff within radius
+          weight = 1.0f - (dist / node.radius);
+          weight = std::max(0.0f, std::min(1.0f, weight));
+        }
+
+        weights.push_back(weight);
+        totalWeight += weight;
+      }
+
+      // Normalize weights if requested and total > 1
+      if (inputs.normalize && totalWeight > 1.0f && totalWeight > 0.0f)
+      {
+        for (auto& w : weights)
+        {
+          w /= totalWeight;
+        }
       }
     }
 
-    // Convert to ossia values
-    for (auto w : weights)
-    {
-      outputs.weights.value.push_back(w);
-    }
-
-    // Send feedback to UI
-    if (send_message)
-    {
-      send_message(
-          execution_value_to_ui{.nodes = inputs.nodes, .inputPoint = inputs.inputPoint});
-    }
+    update_ui();
   }
 
-  ~Nodes() { send_message(execution_value_to_ui{}); }
+  void update_ui()
+  {
+    // Send feedback to UI
+    if(send_message)
+    {
+      send_message(
+          execution_value_to_ui{
+              .nodes = inputs.nodes,
+              .inputPoint = inputs.inputPoint,
+              .voronoiMode = inputs.voronoiMode,
+              .globalRadius = inputs.smooth});
+    }
+  }
 };
 
 }

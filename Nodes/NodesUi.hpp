@@ -20,30 +20,43 @@ struct Nodes::ui
   struct
   {
     halp_meta(layout, hbox)
-    halp_meta(background, mid)
     struct : halp::control<&ins::inputPoint>
     {
       std::function<void(halp::xy_type<float>)> set;
     } inputPoint;
-    halp::item<&ins::globalRadius> globalRadius;
-    halp::item<&ins::normalize> normalize;
+    halp::control<&ins::smooth> globalRadius;
+    halp::control<&ins::normalize> normalize;
+    halp::control<&ins::voronoiMode> voronoiMode;
   } controls;
 
   halp::custom_control<NodesWidget, &ins::nodes> nodesArea;
 
+  void start() { nodesArea.executing = true; }
+  void stop()
+  {
+    nodesArea.reset();
+    nodesArea.voronoiMode = controls.voronoiMode.value;
+    nodesArea.scale = controls.globalRadius.value;
+  }
+  void reset() { stop(); }
+
+  void on_control_update()
+  {
+    nodesArea.cursor = controls.inputPoint.value;
+    nodesArea.nodes = nodesArea.value;
+    nodesArea.voronoiMode = controls.voronoiMode.value;
+    nodesArea.scale = controls.globalRadius.value;
+  }
   struct bus
   {
     void init(ui& ui)
     {
-      // Set up callback when nodes change in the widget
-      // ui.nodesArea.on_nodes_changed = [&ui, this] {
-      //   // Send message to processing thread
-      //   this->send_message(Nodes::nodes_update_message{.nodes = ui.nodesArea.nodes});
-      // };
+      ui.nodesArea.voronoiMode = ui.controls.voronoiMode.value;
+      ui.nodesArea.cursor = ui.controls.inputPoint.value;
+      ui.nodesArea.nodes = ui.nodesArea.value;
+
       ui.nodesArea.on_input_changed = [&ui, this] {
-        // Send message to processing thread
-        // FIXME support an update method here?
-        ui.controls.inputPoint.set(ui.nodesArea.input_value);
+        ui.controls.inputPoint.set(ui.nodesArea.cursor);
         this->send_message(Nodes::nodes_update_message{.nodes = ui.nodesArea.nodes});
       };
     }
@@ -57,7 +70,9 @@ struct Nodes::ui
     static void do_process(ui& self, Nodes::execution_value_to_ui msg)
     {
       self.nodesArea.runtimeNodes = std::move(msg.nodes);
-      self.nodesArea.runtimeInputPoint = msg.inputPoint;
+      self.nodesArea.runtime_cursor = msg.inputPoint;
+      self.nodesArea.voronoiMode = msg.voronoiMode;
+      self.nodesArea.globalRadius = msg.globalRadius;
       self.nodesArea.update();
     }
 
