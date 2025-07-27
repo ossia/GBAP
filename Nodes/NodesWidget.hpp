@@ -186,8 +186,13 @@ struct NodesWidget
     return -1;
   }
 
-  bool mouse_press(double x, double y)
+  bool mouse_press(auto event)
   {
+    using button_type = decltype(event.button);
+    auto x = event.x;
+    auto y = event.y;
+    auto right_click = event.button == button_type::right;
+
     // Check if clicking on input point
     double inputX = cursor.x * width();
     double inputY = cursor.y * height();
@@ -202,8 +207,20 @@ struct NodesWidget
     int nodeIndex = findNodeAt(x, y);
     if (nodeIndex >= 0)
     {
-      transaction.start();
-      selectedNode = nodeIndex;
+      if(right_click)
+      {
+        nodes.erase(nodes.begin() + nodeIndex);
+        nodeIndex = -1;
+
+        transaction.start();
+        transaction.update(nodes);
+        transaction.commit();
+      }
+      else
+      {
+        transaction.start();
+        selectedNode = nodeIndex;
+      }
       return true;
     }
 
@@ -298,7 +315,6 @@ struct NodesWidget
     weights.resize(N);
 
     // Render voronoi cells to pixmap
-    ;
     for(int py = 0; py < h; py += step)
     {
       for(int px = 0; px < w; px += step)

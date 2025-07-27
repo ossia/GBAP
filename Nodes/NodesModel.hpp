@@ -8,7 +8,9 @@
 #include <halp/sample_accurate_controls.hpp>
 
 #include <cmath>
+
 #include <limits>
+#include <variant>
 #include <vector>
 
 namespace spat
