@@ -9,10 +9,10 @@
 namespace spat
 {
 
-class matrix
+class Matrix
 {
 public:
-  halp_meta(name, "matrix")
+  halp_meta(name, "Matrix spatialization")
   halp_meta(category, "Audio/Spatialization")
   halp_meta(c_name, "matrix")
   halp_meta(uuid, "359C787C-E600-48E5-A6E6-AA83E94FCDF4")

@@ -3,7 +3,7 @@
 namespace spat
 {
 
-void matrix::operator()(halp::tick t)
+void Matrix::operator()(halp::tick t)
 {
   // Update the output audio channel count if this changed
   int out_channels = inputs.outs.value + inputs.offs.value;

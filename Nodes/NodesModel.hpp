@@ -20,7 +20,7 @@ class Nodes
 {
 public:
   halp_meta(name, "Nodes")
-  halp_meta(category, "Control/Spatialization")
+  halp_meta(category, "Spatialization")
   halp_meta(c_name, "Nodes")
   halp_meta(uuid, "9e7f5d2a-b3c4-4e8a-9f1d-6a2b3c4d5e6f")
   halp_meta(author, "ossia score")

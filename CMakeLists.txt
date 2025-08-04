@@ -37,7 +37,7 @@ avnd_score_plugin_add(
     matrix/matrixModel.cpp
     matrix/matrixUi.hpp
   TARGET matrix
-  MAIN_CLASS matrix
+  MAIN_CLASS Matrix
   NAMESPACE spat
 )
 

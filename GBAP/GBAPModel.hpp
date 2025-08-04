@@ -16,7 +16,7 @@ class GBAP
 {
 public:
   halp_meta(name, "GBAP")
-  halp_meta(category, "Control/Spatialization")
+  halp_meta(category, "Spatialization")
   halp_meta(c_name, "GBAP")
   halp_meta(uuid, "81DB0C30-175B-422E-8C5F-87569D50548E")
   halp_meta(

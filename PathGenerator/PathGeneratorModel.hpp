@@ -19,7 +19,7 @@ class PathGenerator {
 public:
   halp_meta(name, "PathGenerator")
   halp_meta(c_name, "pathgenerator")
-  halp_meta(category, "Control/Spatialization")
+  halp_meta(category, "Spatialization")
   halp_meta(description, "This process generates points that move dynamically along a given trajectory.")
   halp_meta(manual_url, "https://ossia.io/score-docs/processes/pathgenerator.html")
   halp_meta(author, "Ahmed El Moudden, Société des Arts Technologiques")
