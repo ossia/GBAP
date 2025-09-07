@@ -15,7 +15,7 @@ struct Nodes::ui
 
   halp_meta(name, "Main")
   halp_meta(layout, vbox)
-  halp_meta(background, dark)
+  halp_meta(background, background_dark)
 
   struct
   {

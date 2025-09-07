@@ -12,7 +12,7 @@ struct GBAP::ui
 
   halp_meta(name, "Main")
   halp_meta(layout, hbox)
-  halp_meta(background, dark)
+  halp_meta(background, background_dark)
 
   struct
   {
