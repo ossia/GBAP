@@ -168,11 +168,20 @@ void GBAP::operator()(halp::tick t)
       normalizeArray(vol);
     }
 
-    const float gain = inputs.gain.value
-                       * ((inputs.weights.value.size() > 0)
-                              ? inputs.weights.value[inputs.systemNumber.value - 1]
-                              : 1.f);
-    mult(vol, gain);
+    int nsystem = inputs.systemNumber.value - 1;
+    if(nsystem >= 0 && nsystem < inputs.weights.value.size())
+    {
+
+      const float gain = inputs.gain.value
+                         * ((inputs.weights.value.size() > 0)
+                                ? inputs.weights.value[inputs.systemNumber.value - 1]
+                                : 1.f);
+      mult(vol, gain);
+    }
+    else
+    {
+      mult(vol, 0.0);
+    }
     //vols = vols.concat(volumes);
   }
 
