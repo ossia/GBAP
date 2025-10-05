@@ -81,3 +81,4 @@ avnd_score_plugin_finalize(
   PLUGIN_UUID "1057641E-4253-4BD3-802B-09F063FF559C"
 )
 
+score_optimize_in_debug_mode(${PROJECT_NAME})
