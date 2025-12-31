@@ -5,6 +5,9 @@ namespace spat
 
 void Matrix::operator()(halp::tick t)
 {
+  if(inputs.audio.channels == 0)
+    return;
+
   // Update the output audio channel count if this changed
   int out_channels = inputs.outs.value + inputs.offs.value;
   if(out_channels != this->prev_outs)
@@ -14,10 +17,14 @@ void Matrix::operator()(halp::tick t)
     return;
   }
 
-  // Apply the matrix to the audio inputz
+  if(inputs.weights.value.empty()) {
+    inputs.weights.value.resize(inputs.audio.channels, 1.f);
+  }
+
+  // Apply the matrix to the audio inputs
   for(int i = 0; i < inputs.audio.channels; i++)
   {
-    auto* in = inputs.audio[i];
+    if(auto* in = inputs.audio[i]) {
     for(int k = 0; k < outputs.audio.channels; k++)
     {
       auto weight = (k < inputs.offs.value ) ? 0.f :
@@ -31,6 +38,7 @@ void Matrix::operator()(halp::tick t)
       {
         out[j] = inputs.gain * weight * in[j];
       }
+    }
     }
   }
 }
