@@ -1,3 +1,3 @@
-# MBAP
-A new and wonderful [ossia score](https://ossia.io) add-on
+# GBAP
+A grid-based panning system, bith cascading capabilities
  
