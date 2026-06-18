@@ -1,5 +1,4 @@
 name: Build
-
 on:
   pull_request:
   push:
@@ -11,8 +10,21 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # ossia score addon: dev tree + SDK (latest/continuous) + JIT + tag-gated release,
-  # all four tracks bundled into one reusable workflow (was builds-dev/builds-sdk/jit/release).
-  ci:
+  # Build + package the score add-on (dev / SDK / JIT / release tracks).
+  score:
     uses: ossia/actions/.github/workflows/score-addon.yml@master
     secrets: inherit
+
+  # Build the same object(s) standalone, one artifact per back-end.
+  # CATEGORY object (default, no CATEGORY/BACKENDS declared): data / message
+  # back-ends, no audio plugin formats.
+  standalone:
+    uses: ossia/actions/.github/workflows/avnd-addon.yml@master
+    secrets: inherit
+    with:
+      pd: true
+      max: true
+      python: true
+      touchdesigner: true
+      godot: true
+      wasm: true
