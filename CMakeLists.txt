@@ -75,6 +75,47 @@ avnd_score_plugin_add(
   NAMESPACE  spat
 )
 
+avnd_score_plugin_add(
+  BASE_TARGET score_addon_gbap
+  SOURCES
+    SpeakerSetup/SpeakerSetup.hpp
+    SpeakerSetup/SpeakerSetup.cpp
+    3rdparty/speaker-setup-format-converter/aiira_model.hpp
+    3rdparty/speaker-setup-format-converter/aiira_parser.cpp
+    3rdparty/speaker-setup-format-converter/aiira_parser.hpp
+    3rdparty/speaker-setup-format-converter/converter.cpp
+    3rdparty/speaker-setup-format-converter/converter.hpp
+    3rdparty/speaker-setup-format-converter/csv_model.hpp
+    3rdparty/speaker-setup-format-converter/csv_parser.cpp
+    3rdparty/speaker-setup-format-converter/csv_parser.hpp
+    3rdparty/speaker-setup-format-converter/ease_model.hpp
+    3rdparty/speaker-setup-format-converter/ease_parser.cpp
+    3rdparty/speaker-setup-format-converter/ease_parser.hpp
+    3rdparty/speaker-setup-format-converter/fourdsound_model.hpp
+    3rdparty/speaker-setup-format-converter/fourdsound_parser.cpp
+    3rdparty/speaker-setup-format-converter/fourdsound_parser.hpp
+    3rdparty/speaker-setup-format-converter/generic_model.hpp
+    3rdparty/speaker-setup-format-converter/spat_model.hpp
+    3rdparty/speaker-setup-format-converter/spat_parser.cpp
+    3rdparty/speaker-setup-format-converter/spat_parser.hpp
+    3rdparty/speaker-setup-format-converter/spat_revolution_model.hpp
+    3rdparty/speaker-setup-format-converter/spat_revolution_parser.cpp
+    3rdparty/speaker-setup-format-converter/spat_revolution_parser.hpp
+    3rdparty/speaker-setup-format-converter/speakerview_model.hpp
+    3rdparty/speaker-setup-format-converter/speakerview_parser.cpp
+    3rdparty/speaker-setup-format-converter/speakerview_parser.hpp
+    3rdparty/speaker-setup-format-converter/utils.hpp    
+    3rdparty/pugixml/src/pugiconfig.hpp    
+    3rdparty/pugixml/src/pugixml.hpp    
+    3rdparty/pugixml/src/pugixml.cpp    
+  TARGET SpeakerSetup
+  MAIN_CLASS SpeakerSetup
+  NAMESPACE  spat
+)
+target_include_directories(score_addon_gbap PRIVATE "${3RDPARTY_FOLDER}/csv2/include")
+target_include_directories(score_addon_gbap PRIVATE "3rdparty/speaker-setup-format-converter")
+target_include_directories(score_addon_gbap PRIVATE "3rdparty/pugixml/src")
+
 avnd_score_plugin_finalize(
   BASE_TARGET score_addon_gbap
   PLUGIN_VERSION 1
