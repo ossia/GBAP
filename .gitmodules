@@ -1,0 +1,6 @@
+[submodule "3rdparty/speaker-setup-format-converter"]
+	path = 3rdparty/speaker-setup-format-converter
+	url = https://github.com/sat-mtl/speaker-setup-format-converter
+[submodule "3rdparty/pugixml"]
+	path = 3rdparty/pugixml
+	url = https://github.com/zeux/pugixml
