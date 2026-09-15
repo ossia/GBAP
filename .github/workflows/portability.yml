@@ -1,0 +1,19 @@
+name: Portability
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+
+concurrency:
+  group: ${{ github.workflow }}-portability-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    uses: ossia/actions/.github/workflows/avnd-portability.yml@master
+    secrets: inherit
+    with:
+      # iOS off: Xcode multi-config plumbing fails and iOS isn't a meaningful
+      # target. The other 20 lanes cover the portability surface.
+      ios: false
