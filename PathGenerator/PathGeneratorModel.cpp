@@ -49,17 +49,22 @@ ossia::vec2f
 PathGenerator::path_point(const std::vector<ossia::value>& nodes, float u) const noexcept
 {
   const ossia::vec2f a = node_at(nodes, 0);
-  const float rx = inputs.radius.value.x;
-  const float ry = inputs.radius.value.y;
-  const float phi = TWO_PI * inputs.phase;
+  // The second node is a handle: its distance from the first is the size of the
+  // shape and its direction is where the shape starts, so every trajectory
+  // passes through it. Radius is then an x/y aspect on top of that.
+  const ossia::vec2f b = nodes.size() > 1 ? node_at(nodes, 1) : a;
+  const float dx = b[0] - a[0];
+  const float dy = b[1] - a[1];
+  const float R = std::sqrt(dx * dx + dy * dy);
+  const float rx = R * inputs.radius.value.x;
+  const float ry = R * inputs.radius.value.y;
+  const float phi = std::atan2(dy, dx) + TWO_PI * inputs.phase;
 
   switch(inputs.path)
   {
     case Linear:
     {
-      // A source that never got a second node stays put rather than reading it.
-      const ossia::vec2f b = nodes.size() > 1 ? node_at(nodes, 1) : a;
-      return {a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u};
+      return {a[0] + dx * u, a[1] + dy * u};
     }
 
     case Circle:
@@ -87,9 +92,10 @@ PathGenerator::path_point(const std::vector<ossia::value>& nodes, float u) const
     {
       // r = cos(k.θ) with k = Ratio X, swept over Ratio Y turns so that
       // rational k/1 ratios close their petals.
-      const float th = TWO_PI * inputs.ratio_y * u + phi;
+      const float th = TWO_PI * inputs.ratio_y * u;
       const float r = std::cos(inputs.ratio_x * th);
-      return {a[0] + rx * r * std::cos(th), a[1] + ry * r * std::sin(th)};
+      return {
+          a[0] + rx * r * std::cos(th + phi), a[1] + ry * r * std::sin(th + phi)};
     }
 
     case Polygon:
