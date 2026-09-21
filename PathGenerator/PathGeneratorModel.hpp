@@ -9,11 +9,16 @@
 
 namespace spat {
 
+//! Kept in sync with score::QGraphicsPathGeneratorXY::Path, which draws the
+//! same curves in the editor.
 enum Path
 {
   Linear,
   Circle,
-  Spiral
+  Spiral,
+  Lissajous,
+  Rose,
+  Polygon
 };
 class PathGenerator {
 public:
@@ -42,18 +47,28 @@ public:
     } pos;
 
     halp::xy_spinboxes_f32<"Radius", halp::range{.min = 0., .max = 1, .init = 0.2}> radius;
+
+    // Shared by the curved paths, with a per-path meaning documented in path_point.
+    halp::spinbox_i32<"Ratio X", halp::range{.min = 1, .max = 16, .init = 3}> ratio_x;
+    halp::spinbox_i32<"Ratio Y", halp::range{.min = 1, .max = 16, .init = 2}> ratio_y;
+    halp::knob_f32<"Phase", halp::range{.min = 0., .max = 1., .init = 0.}> phase;
   } inputs;
 
   struct {
     halp::val_port<"Output", std::vector<ossia::value>> OutTab;
+
+    //! Position along the trajectory, in [0; 1] with the ping-pong already
+    //! applied: this is what the editor needs to draw the moving point.
+    halp::hbargraph_f32<"Progress", halp::range{.min = 0., .max = 1., .init = 0.}> progress;
   } outputs;
 
   using tick = halp::tick_flicks;
 
   void operator()(const halp::tick_flicks& t);
-  void linear_path(const halp::tick_flicks& t, const float relativePos, const bool reverse);
-  void circle_path(const halp::tick_flicks& t, const float relativePos, const bool reverse);
-  void spiral_path(const halp::tick_flicks& t, const float relativePos, const bool reverse);
+
+private:
+  ossia::vec2f
+  path_point(const std::vector<ossia::value>& nodes, float u) const noexcept;
 };
 
 }
