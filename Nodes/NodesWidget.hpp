@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 
 #include <QPainter>
 
@@ -30,7 +31,10 @@ struct NodesWidget
   //! radius stays reachable.
   double nodePickRadius(float z01) const noexcept
   {
-    return std::max(nodeRadius(z01), 15.0);
+    // Follows what is drawn, but capped: at z = 0.5 the disc would be 200px,
+    // most of the canvas, and clicking empty space to add a node would become
+    // impossible.
+    return std::clamp(nodeRadius(z01), 15.0, 60.0);
   }
 
   void paint(auto ctx)
