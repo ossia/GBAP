@@ -19,6 +19,20 @@ struct NodesWidget
   static constexpr double width() { return 400.; }
   static constexpr double height() { return 400.; }
 
+  //! Drawn radius of a node, in pixels. In Voronoi mode the cell itself carries
+  //! the extent, the node is only marked by a small disc.
+  double nodeRadius(float z01) const noexcept
+  {
+    return voronoiMode ? 5.0 : z01 * std::min(width(), height());
+  }
+
+  //! Grabbable radius: the drawn disc, with a floor so that a node with a tiny
+  //! radius stays reachable.
+  double nodePickRadius(float z01) const noexcept
+  {
+    return std::max(nodeRadius(z01), 15.0);
+  }
+
   void paint(auto ctx)
   {
     // Draw background
@@ -45,7 +59,7 @@ struct NodesWidget
       {
         const double centerX = node.x * width();
         const double centerY = node.y * height();
-        const double radius = voronoiMode ? 5.0 : node.z * std::min(width(), height());
+        const double radius = nodeRadius(node.z);
 
         // Draw weight as transparent overlay
         ctx.begin_path();
@@ -60,7 +74,7 @@ struct NodesWidget
     {
       const double centerX = x01 * width();
       const double centerY = y01 * height();
-      const double radius = voronoiMode ? 5.0 : r01 * std::min(width(), height());
+      const double radius = nodeRadius(r01);
 
       // Draw node circle
       if (i == selectedNode)
@@ -173,17 +187,21 @@ struct NodesWidget
 
   int findNodeAt(double x, double y) const
   {
+    int found = -1;
+    double closest = std::numeric_limits<double>::max();
     for (int i = 0; i < std::ssize(nodes); ++i)
     {
       double nodeX = nodes[i].x * width();
       double nodeY = nodes[i].y * height();
 
-      if(distance(x, y, nodeX, nodeY) < 15.0) // 15 pixel threshold
+      const double dist = distance(x, y, nodeX, nodeY);
+      if(dist < nodePickRadius(nodes[i].z) && dist < closest)
       {
-        return i;
+        closest = dist;
+        found = i;
       }
     }
-    return -1;
+    return found;
   }
 
   bool mouse_press(auto event)
@@ -225,6 +243,7 @@ struct NodesWidget
     }
 
     // Create new node
+    transaction.start();
     nodes.push_back(
         {static_cast<float>(x / width()), static_cast<float>(y / height()), 0.1f});
     selectedNode = std::ssize(nodes) - 1;
