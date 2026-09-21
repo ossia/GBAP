@@ -46,7 +46,9 @@ public:
       std::vector<ossia::value> value;
     } pos;
 
-    halp::xy_spinboxes_f32<"Radius", halp::range{.min = 0., .max = 1, .init = 0.2}> radius;
+    //! x/y aspect applied to the size the handle node sets: 1,1 is a circle.
+    halp::xy_spinboxes_f32<"Aspect", halp::range{.min = 0., .max = 4, .init = 1.}>
+        radius;
 
     // Shared by the curved paths, with a per-path meaning documented in path_point.
     halp::spinbox_i32<"Ratio X", halp::range{.min = 1, .max = 16, .init = 3}> ratio_x;
