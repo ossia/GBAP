@@ -47,7 +47,10 @@ public:
     } pos;
 
     //! x/y aspect applied to the size the handle node sets: 1,1 is a circle.
-    halp::xy_spinboxes_f32<"Aspect", halp::range{.min = 0., .max = 4, .init = 1.}>
+    //! Keeps the name it had: reloadPortsInNewProcess matches ports by name, so
+    //! renaming it would drop the value, the cables and the address of every
+    //! document that already has one.
+    halp::xy_spinboxes_f32<"Radius", halp::range{.min = 0., .max = 4, .init = 1.}>
         radius;
 
     // Shared by the curved paths, with a per-path meaning documented in path_point.
