@@ -1,93 +1,113 @@
 #include "PathGenerator.hpp"
+
+#include <ossia/detail/math.hpp>
+
 #include <cmath>
-#include <numbers>
 
 namespace spat {
 
-// Constants for angle calculations
-constexpr float TWO_PI = 2.0f * std::numbers::pi;
-constexpr float FOUR_PI = 4.0f * std::numbers::pi;
+constexpr float TWO_PI = ossia::two_pi;
+
+static ossia::vec2f node_at(const std::vector<ossia::value>& nodes, std::size_t i) noexcept
+{
+  if(i < nodes.size())
+    if(auto* v = nodes[i].target<ossia::vec2f>())
+      return *v;
+  return ossia::vec2f{0.5f, 0.5f};
+}
 
 void PathGenerator::operator()(const halp::tick_flicks& t) {
-  float relativePos = std::fmod(t.relative_position * inputs.speed, 1.0f);
-  bool reverse = static_cast<int>(t.relative_position * inputs.speed) % 2 != 0;
+  const float raw = t.relative_position * inputs.speed;
+  const float frac = raw - std::floor(raw);
+  const bool reverse = inputs.loop && (static_cast<int64_t>(raw) % 2 != 0);
 
-  outputs.OutTab.value.clear();
+  // Every trajectory is a function of a single parameter that walks [0; 1]
+  // forward, then backwards when ping-pong is on.
+  const float u = reverse ? 1.f - frac : frac;
 
-  // Initialize output positions with first point from each input
-  for (const auto& val : inputs.pos.value) {
-    const auto& vec = val.get<std::vector<ossia::value>>();
-    outputs.OutTab.value.push_back(vec[0].get<ossia::vec2f>());
+  auto& out = outputs.OutTab.value;
+  const auto& sources = inputs.pos.value;
+
+  // Only touched when a source is added or removed: the steady state reuses
+  // both the vector's capacity and the vec2f already stored in each value.
+  if(out.size() != sources.size())
+    out.assign(sources.size(), ossia::value{ossia::vec2f{}});
+
+  for(std::size_t i = 0; i < sources.size(); ++i)
+  {
+    const auto* nodes = sources[i].target<std::vector<ossia::value>>();
+    if(!nodes || nodes->empty())
+      continue;
+
+    out[i].get<ossia::vec2f>() = path_point(*nodes, u);
   }
 
-  // Dispatch to path function
-  switch (inputs.path) {
-    case 0: linear_path(t, relativePos, reverse); break;
-    case 1: circle_path(t, relativePos, reverse); break;
-    case 2: spiral_path(t, relativePos, reverse); break;
-    default: break;
-  }
+  outputs.progress = u;
 }
 
-// Linear interpolation between two points
-void PathGenerator::linear_path(const halp::tick_flicks&, float relativePos, bool reverse) {
-  for (size_t i = 0; i < outputs.OutTab.value.size(); ++i) {
-    const auto& vec = inputs.pos.value[i].get<std::vector<ossia::value>>();
-    const auto& start = vec[0].get<ossia::vec2f>();
-    const auto& end   = vec[1].get<ossia::vec2f>();
-    auto& out = outputs.OutTab.value[i].get<ossia::vec2f>();
+ossia::vec2f
+PathGenerator::path_point(const std::vector<ossia::value>& nodes, float u) const noexcept
+{
+  const ossia::vec2f a = node_at(nodes, 0);
+  const float rx = inputs.radius.value.x;
+  const float ry = inputs.radius.value.y;
+  const float phi = TWO_PI * inputs.phase;
 
-    if (inputs.loop && reverse) {
-      out = {
-          end[0] - (end[0] - start[0]) * relativePos,
-          end[1] - (end[1] - start[1]) * relativePos
-      };
-    } else {
-      out = {
-          start[0] + (end[0] - start[0]) * relativePos,
-          start[1] + (end[1] - start[1]) * relativePos
-      };
+  switch(inputs.path)
+  {
+    case Linear:
+    {
+      // A source that never got a second node stays put rather than reading it.
+      const ossia::vec2f b = nodes.size() > 1 ? node_at(nodes, 1) : a;
+      return {a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u};
+    }
+
+    case Circle:
+    {
+      const float angle = TWO_PI * (1.f - u) + phi;
+      return {a[0] + rx * std::cos(angle), a[1] + ry * std::sin(angle)};
+    }
+
+    case Spiral:
+    {
+      const float angle = 2.f * TWO_PI * u + phi;
+      return {a[0] + rx * u * std::cos(angle), a[1] + ry * u * std::sin(angle)};
+    }
+
+    case Lissajous:
+    {
+      // Ratio X / Ratio Y are the two frequencies, Phase their offset.
+      const float th = TWO_PI * u;
+      return {
+          a[0] + rx * std::sin(inputs.ratio_x * th + phi),
+          a[1] + ry * std::sin(inputs.ratio_y * th)};
+    }
+
+    case Rose:
+    {
+      // r = cos(k.θ) with k = Ratio X, swept over Ratio Y turns so that
+      // rational k/1 ratios close their petals.
+      const float th = TWO_PI * inputs.ratio_y * u + phi;
+      const float r = std::cos(inputs.ratio_x * th);
+      return {a[0] + rx * r * std::cos(th), a[1] + ry * r * std::sin(th)};
+    }
+
+    case Polygon:
+    {
+      // Perimeter of a regular Ratio X-gon inscribed in the radius ellipse.
+      const int n = ossia::max(3, (int)inputs.ratio_x);
+      const float s = u * n;
+      const int k = ossia::min((int)s, n - 1);
+      const float f = s - k;
+      const float a0 = TWO_PI * k / n + phi;
+      const float a1 = TWO_PI * (k + 1) / n + phi;
+      const float x0 = std::cos(a0), y0 = std::sin(a0);
+      const float x1 = std::cos(a1), y1 = std::sin(a1);
+      return {a[0] + rx * (x0 + (x1 - x0) * f), a[1] + ry * (y0 + (y1 - y0) * f)};
     }
   }
-}
 
-// Generate circular motion around a point
-void PathGenerator::circle_path(const halp::tick_flicks&, float relativePos, bool reverse) {
-  float angle = TWO_PI * (inputs.loop && reverse ? relativePos : 1.0f - relativePos);
-
-  for (size_t i = 0; i < outputs.OutTab.value.size(); ++i) {
-    const auto& center = inputs.pos.value[i].get<std::vector<ossia::value>>()[0].get<ossia::vec2f>();
-    auto& out = outputs.OutTab.value[i].get<ossia::vec2f>();
-
-    out = {
-        center[0] + inputs.radius.value.x * std::cos(angle),
-        center[1] + inputs.radius.value.y * std::sin(angle)
-    };
-  }
-}
-
-// Generate expanding spiral motion around a point
-void PathGenerator::spiral_path(const halp::tick_flicks&, float relativePos, bool reverse) {
-  float angle = FOUR_PI * (inputs.loop && reverse ? 1.0f - relativePos : relativePos);
-  float radX = inputs.radius.value.x * relativePos;
-  float radY = inputs.radius.value.y * relativePos;
-
-  for (size_t i = 0; i < outputs.OutTab.value.size(); ++i) {
-    const auto& center = inputs.pos.value[i].get<std::vector<ossia::value>>()[0].get<ossia::vec2f>();
-    auto& out = outputs.OutTab.value[i].get<ossia::vec2f>();
-
-    if (inputs.loop && reverse) {
-      out = {
-          center[0] + (inputs.radius.value.x - radX) * std::cos(angle),
-          center[1] + (inputs.radius.value.y - radY) * std::sin(angle)
-      };
-    } else {
-      out = {
-          center[0] + radX * std::cos(angle),
-          center[1] + radY * std::sin(angle)
-      };
-    }
-  }
+  return a;
 }
 
 }
