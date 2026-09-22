@@ -20,6 +20,17 @@ enum Path
   Rose,
   Polygon
 };
+
+//! What the Output port carries: a vec2f, or a vec3f whose z is either zero or
+//! the Z control. XY first, so that it stays the default of documents saved
+//! before the port had a mode.
+enum OutputMode
+{
+  XY,
+  XY0,
+  XYZ
+};
+
 class PathGenerator {
 public:
   halp_meta(name, "PathGenerator")
@@ -57,6 +68,11 @@ public:
     halp::spinbox_i32<"Ratio X", halp::range{.min = 1, .max = 16, .init = 3}> ratio_x;
     halp::spinbox_i32<"Ratio Y", halp::range{.min = 1, .max = 16, .init = 2}> ratio_y;
     halp::knob_f32<"Phase", halp::range{.min = 0., .max = 1., .init = 0.}> phase;
+
+    halp::enum_t<OutputMode, "Output mode"> output_mode;
+    //! Third coordinate of the XYZ mode: the trajectory is planar, the height
+    //! is set by hand.
+    halp::hslider_f32<"Z", halp::range{.min = 0., .max = 1., .init = 0.}> z;
   } inputs;
 
   struct {
