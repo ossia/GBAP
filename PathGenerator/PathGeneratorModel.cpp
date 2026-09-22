@@ -28,10 +28,21 @@ void PathGenerator::operator()(const halp::tick_flicks& t) {
   auto& out = outputs.OutTab.value;
   const auto& sources = inputs.pos.value;
 
-  // Only touched when a source is added or removed: the steady state reuses
-  // both the vector's capacity and the vec2f already stored in each value.
-  if(out.size() != sources.size())
-    out.assign(sources.size(), ossia::value{ossia::vec2f{}});
+  const OutputMode mode = inputs.output_mode;
+  const bool spatial = mode != OutputMode::XY;
+  const float z = mode == OutputMode::XYZ ? inputs.z : 0.f;
+
+  // Only touched when a source is added or removed, or when the mode changes
+  // the type held in each value: the steady state reuses both the vector's
+  // capacity and the vector already stored in each value.
+  const bool holds_vec3 = !out.empty() && out.front().target<ossia::vec3f>();
+  if(out.size() != sources.size() || (!out.empty() && holds_vec3 != spatial))
+  {
+    if(spatial)
+      out.assign(sources.size(), ossia::value{ossia::vec3f{}});
+    else
+      out.assign(sources.size(), ossia::value{ossia::vec2f{}});
+  }
 
   for(std::size_t i = 0; i < sources.size(); ++i)
   {
@@ -39,7 +50,11 @@ void PathGenerator::operator()(const halp::tick_flicks& t) {
     if(!nodes || nodes->empty())
       continue;
 
-    out[i].get<ossia::vec2f>() = path_point(*nodes, u);
+    const ossia::vec2f p = path_point(*nodes, u);
+    if(spatial)
+      out[i].get<ossia::vec3f>() = ossia::vec3f{p[0], p[1], z};
+    else
+      out[i].get<ossia::vec2f>() = p;
   }
 
   outputs.progress = u;
