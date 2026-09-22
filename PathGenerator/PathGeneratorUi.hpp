@@ -39,8 +39,6 @@ struct PathGenerator::ui
       halp::item<&ins::output_mode> output_mode;
       halp::item<&ins::z> z;
     } output;
-
-    halp::item<&outs::progress> progress;
   } controls;
 
   halp::item<&ins::pos> pos;
