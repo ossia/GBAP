@@ -58,6 +58,7 @@ avnd_score_plugin_add(
     PathGenerator/PathGenerator.hpp
     PathGenerator/PathGeneratorModel.hpp
     PathGenerator/PathGeneratorModel.cpp
+    PathGenerator/PathGeneratorUi.hpp
   TARGET pathgenerator
   MAIN_CLASS PathGenerator
   NAMESPACE spat

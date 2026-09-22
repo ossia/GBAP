@@ -75,13 +75,15 @@ public:
     halp::hslider_f32<"Z", halp::range{.min = 0., .max = 1., .init = 0.}> z;
   } inputs;
 
-  struct {
+  struct outs {
     halp::val_port<"Output", std::vector<ossia::value>> OutTab;
 
     //! Position along the trajectory, in [0; 1] with the ping-pong already
     //! applied: this is what the editor needs to draw the moving point.
     halp::hbargraph_f32<"Progress", halp::range{.min = 0., .max = 1., .init = 0.}> progress;
   } outputs;
+
+  struct ui;
 
   using tick = halp::tick_flicks;
 
