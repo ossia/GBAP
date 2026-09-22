@@ -56,8 +56,6 @@ void PathGenerator::operator()(const halp::tick_flicks& t) {
     else
       out[i].get<ossia::vec2f>() = p;
   }
-
-  outputs.progress = u;
 }
 
 ossia::vec2f
