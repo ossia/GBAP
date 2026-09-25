@@ -41,7 +41,7 @@ struct NodesWidget
   {
     // Draw background
     ctx.set_font("Monospace");
-    ctx.set_font_size(8);
+    ctx.set_font_size(11);
     ctx.set_fill_color({20, 20, 20, 255});
     ctx.begin_path();
     ctx.draw_rect(0., 0., width(), height());
