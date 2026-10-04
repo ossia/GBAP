@@ -68,6 +68,7 @@ avnd_score_plugin_add(
   BASE_TARGET score_addon_gbap
   SOURCES
     Nodes/Nodes.hpp
+    Nodes/NodesFalloff.hpp
     Nodes/NodesModel.hpp
     Nodes/NodesUi.hpp
     Nodes/NodesWidget.hpp
@@ -83,3 +84,12 @@ avnd_score_plugin_finalize(
 )
 
 score_optimize_in_debug_mode(${PROJECT_NAME})
+
+# Pure math on the process: no application around it.
+if(SCORE_TESTING AND COMMAND score_add_test)
+  score_add_test(score_addon_gbap_nodes_voronoi_test
+    SOURCES tests/NodesVoronoiTest.cpp)
+  target_include_directories(score_addon_gbap_nodes_voronoi_test PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${SCORE_ROOT_SOURCE_DIR}/3rdparty/avendish/include")
+endif()
