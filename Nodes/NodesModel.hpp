@@ -1,5 +1,7 @@
 #pragma once
 
+#include "NodesFalloff.hpp"
+
 #include <ossia/network/value/value.hpp>
 
 #include <halp/audio.hpp>
@@ -157,18 +159,7 @@ public:
       // This approach considers all nodes within the blur radius
       for (int i = 0; i < m_nodes.size(); ++i)
       {
-        float weight = 0.0f;
-        float distFromClosest = distances[i] - minDist;
-        
-        if (distFromClosest < 2.0f * blurRadius)
-        {
-          // Node is within transition zone
-          // Use smooth exponential falloff for better blending
-          float t = distFromClosest / (2.0f * blurRadius);
-          weight = std::exp(-3.0f * t * t); // Gaussian-like falloff
-        }
-        
-        weights.push_back(weight);
+        weights.push_back(voronoiWeight(distances[i] - minDist, blurRadius));
       }
       
       // Normalize weights to ensure they sum to 1

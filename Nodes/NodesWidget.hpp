@@ -1,4 +1,6 @@
 #pragma once
+#include "NodesFalloff.hpp"
+
 #include <algorithm>
 
 #include <QPainter>
@@ -357,16 +359,7 @@ struct NodesWidget
         float totalWeight = 0.0f;
         for(int i = 0; i < N; ++i)
         {
-          float weight = 0.0f;
-          float distFromClosest = distances[i] - minDist;
-          
-          if (distFromClosest < 2.0f * blurRadius)
-          {
-            // Node is within transition zone
-            float t = distFromClosest / (2.0f * blurRadius);
-            weight = std::exp(-3.0f * t * t); // Gaussian-like falloff
-          }
-
+          const float weight = voronoiWeight(distances[i] - minDist, blurRadius);
           weights[i] = weight;
           totalWeight += weight;
         }
