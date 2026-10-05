@@ -1,5 +1,5 @@
-// spat::Nodes in Voronoi mode: the weights move continuously with the input
-// point, also where a node enters or leaves the blend zone.
+// spat::Nodes in Voronoi mode: the weights vary continuously with the input
+// point, including where a node enters or leaves the blend zone.
 
 #include <Nodes/NodesModel.hpp>
 
@@ -12,7 +12,6 @@ using Catch::Approx;
 
 namespace
 {
-// The nodes of the user's bug-nodes.score.
 spat::Nodes make_nodes()
 {
   spat::Nodes n;
@@ -50,7 +49,6 @@ TEST_CASE("Nodes: a node fades in from zero as the point leaves a full zone", "[
     prev = w;
   }
   CHECK(prev[2] > 0.f);
-  // A step of 1e-4 moves a weight by much less than a percent.
   CHECK(worst < 1e-3f);
 }
 

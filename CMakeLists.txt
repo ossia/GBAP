@@ -85,7 +85,6 @@ avnd_score_plugin_finalize(
 
 score_optimize_in_debug_mode(${PROJECT_NAME})
 
-# Pure math on the process: no application around it.
 if(SCORE_TESTING AND COMMAND score_add_test)
   score_add_test(score_addon_gbap_nodes_voronoi_test
     SOURCES tests/NodesVoronoiTest.cpp)
