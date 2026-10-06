@@ -16,8 +16,8 @@ class MultiCursorManager
 public:
   halp_meta(name, "Multi-Cursor Manager")
   halp_meta(c_name, "multicursormanager")
-  halp_meta(category, "Spatialization")
-  halp_meta(description, "Can generate a position table")
+  halp_meta(category, "Spatial")
+  halp_meta(description, "Generate a table of cursor positions for spatial control.")
   halp_meta(manual_url, "https://ossia.io/score-docs/processes/multicursor.html")
   halp_meta(author, "Ahmed El Moudden, Société des Arts Technologiques")
   halp_meta(uuid, "20f771a1-0e9a-4db2-bb7c-011467d84ded")
