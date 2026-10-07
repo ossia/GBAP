@@ -13,7 +13,7 @@ class Matrix
 {
 public:
   halp_meta(name, "Matrix spatialization")
-  halp_meta(category, "Spatial")
+  halp_meta(category, "Spatial/Audio")
   halp_meta(
       description,
       "Apply per-output-channel weights, gain and channel offset to incoming audio.")
